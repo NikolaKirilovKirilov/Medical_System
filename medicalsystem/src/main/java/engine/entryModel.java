@@ -25,7 +25,7 @@ public class entryModel extends JFrame implements ActionListener{
 
 	
 	public entryModel() {
-		this.setTitle("Entry");
+		this.setTitle("Вход");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setResizable(false);
 		this.setSize(300, 290);
@@ -38,8 +38,8 @@ public class entryModel extends JFrame implements ActionListener{
 		
 		comboBox = new JComboBox<String>(positions);
 		name = new JTextField();
-		code = new JTextField("Code");
-		password = new JPasswordField("Password");
+		code = new JTextField();
+		password = new JPasswordField();
 		enter = new JButton();
 		
 		comboBox.setBounds(80, 20, 120, 30);

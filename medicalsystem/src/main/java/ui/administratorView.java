@@ -5,13 +5,17 @@ import java.awt.*;
 import java.awt.event.*; 
 import javax.swing.*;
 import database.*;
+import customColors.ColorSchemes;
 
 
 
 public class administratorView extends JFrame implements ActionListener{
-	JFrame frame;
 	
+	JFrame frame;
 	JPanel mainPanel;
+	JPanel headerPanel;
+	JPanel menuPanel;
+	JPanel contentPanel;
 	
 	static String[] butNmaes = {"Пациенти", "Лекари", "Болести", "Настройки"}; 
 	
@@ -32,11 +36,11 @@ public class administratorView extends JFrame implements ActionListener{
 		
 		//-------------------------------------------------------------------------------------------------------------------------------------------------------
 		
-		 JPanel headerPanel = new JPanel();
+		 headerPanel = new JPanel();
 	        headerPanel.setLayout(new GridLayout(1, 4));
 	        headerPanel.setBackground(new Color(82,194,34));
 
-	        Color headerColor = Color.LIGHT_GRAY;
+	        Color headerColor = ColorSchemes.MENU_GREEN;
 	        Color hoverBackgroundColor = Color.DARK_GRAY;
 	        Color hoverTextColor = Color.WHITE;
 	        
@@ -57,7 +61,7 @@ public class administratorView extends JFrame implements ActionListener{
 	        // Create the main work area
 	        mainPanel = new JPanel();
 	        mainPanel.setLayout(new BorderLayout());
-	        mainPanel.setBackground(new Color(242,237,210));
+	        mainPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
 	        add(mainPanel, BorderLayout.CENTER);
 
 	        // Set action listeners for the buttons

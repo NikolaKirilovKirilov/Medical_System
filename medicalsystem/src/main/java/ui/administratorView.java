@@ -17,7 +17,8 @@ public class administratorView extends JFrame implements ActionListener{
 	JPanel menuPanel;
 	JPanel contentPanel;
 	
-	static String[] butNmaes = {"Пациенти", "Лекари", "Болести", "Настройки"}; 
+	static String[] butNames = {"Пациенти", "Лекари", "Болести", "Настройки"};
+	static String[] testEntries = {"entry0", "entry1", "entry2"};
 	
 	Color cHeader = new Color(35, 64, 153);
 	
@@ -60,13 +61,15 @@ public class administratorView extends JFrame implements ActionListener{
 
 	        // Create the main work area
 	        mainPanel = new JPanel();
-	        mainPanel.setLayout(new BorderLayout());
+	        mainPanel.setLayout(new FlowLayout());
 	        mainPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
-	        add(mainPanel, BorderLayout.CENTER);
+	        add(mainPanel, FlowLayout.CENTER);
 
 	        // Set action listeners for the buttons
-	        patientButton.addActionListener(e -> updateMainPanel("Patient"));
-	        doctorButton.addActionListener(e -> updateMainPanel("Doctor"));
+	        // patientButton.addActionListener(e -> updateMainPanel("Patient"));
+	        patientButton.addActionListener(e -> setPatientPage());
+	        //doctorButton.addActionListener(e -> updateMainPanel("Doctor"));
+	        doctorButton.addActionListener(e -> setDoctorPage());
 	        diseaseButton.addActionListener(e -> updateMainPanel("Disease"));
 	        settingsButton.addActionListener(e -> updateMainPanel("Settings"));
 	}
@@ -84,6 +87,7 @@ public class administratorView extends JFrame implements ActionListener{
 	        button.setBorderPainted(false);
 	        button.setFocusPainted(false);
 	        button.setOpaque(true);
+	        //                 .,/
 	        button.setFont(new Font("Arial", Font.BOLD, 14));
 
 	        // Add hover effects
@@ -119,4 +123,42 @@ public class administratorView extends JFrame implements ActionListener{
         mainPanel.revalidate();
         mainPanel.repaint();
     }
+    
+    private void setHomePage() {}
+    
+    private void setPatientPage() {
+    	
+    	mainPanel.removeAll();
+    	JLabel label = new JLabel("Height: " + mainPanel.getHeight() + " Width: " + mainPanel.getWidth());
+    	label.setHorizontalAlignment(SwingConstants.CENTER);
+    	mainPanel.add(label, BorderLayout.CENTER);
+    	mainPanel.revalidate();
+        mainPanel.repaint();
+    	
+    	for(String entry : testEntries)
+    	{
+    		
+    	}
+    }
+    
+    private void setDoctorPage() {
+    	mainPanel.removeAll();
+    	
+    	menuPanel = new JPanel();
+    		menuPanel.setSize(427 , 671);
+    		menuPanel.setBackground(new Color(55, 144, 52));
+    		
+    	contentPanel = new JPanel();
+    		contentPanel.setSize(854, 671);
+    		contentPanel.setBackground(Color.WHITE);
+    	
+    	mainPanel.add(menuPanel); mainPanel.add(contentPanel);
+    	mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+    
+    private void setDiseasePage() {}
+    
+    private void setSettingsPage() {}
+    
 }

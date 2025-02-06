@@ -1,24 +1,24 @@
 package ui;
 
-import java.util.*;
 import java.awt.*;
 import java.awt.event.*; 
 import javax.swing.*;
+import javax.swing.border.*;
+
 import database.*;
-import customColors.ColorSchemes;
-
-
+import customColors.*;
+import uiComponents.*;
 
 public class administratorView extends JFrame implements ActionListener{
 	
 	JFrame frame;
 	JPanel mainPanel;
 	JPanel headerPanel;
-	JPanel menuPanel;
-	JPanel contentPanel;
+	RoundedJPanel menuPanel;
+	RoundedJPanel contentPanel;
 	
 	static String[] butNames = {"Пациенти", "Лекари", "Болести", "Настройки"};
-	static String[] testEntries = {"entry0", "entry1", "entry2"};
+	static String[] testEntries = {"entry0", "entry1", "entry2", "entry3"};
 	
 	Color cHeader = new Color(35, 64, 153);
 	
@@ -61,7 +61,7 @@ public class administratorView extends JFrame implements ActionListener{
 
 	        // Create the main work area
 	        mainPanel = new JPanel();
-	        mainPanel.setLayout(new FlowLayout());
+	        mainPanel.setLayout(new BoxLayout(mainPanel, 2));
 	        mainPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
 	        add(mainPanel, FlowLayout.CENTER);
 
@@ -137,21 +137,30 @@ public class administratorView extends JFrame implements ActionListener{
     	
     	for(String entry : testEntries)
     	{
-    		
+    		JPanel entryPanel = new JPanel();
+    		JLabel name = new JLabel(entry);
+    		entryPanel.add(name);
+    		contentPanel.add(entryPanel);
     	}
     }
     
     private void setDoctorPage() {
     	mainPanel.removeAll();
     	
-    	menuPanel = new JPanel();
-    		menuPanel.setSize(427 , 671);
+    	menuPanel = new RoundedJPanel(20, 417 , 661);
+    		menuPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
     		menuPanel.setBackground(new Color(55, 144, 52));
     		
-    	contentPanel = new JPanel();
-    		contentPanel.setSize(854, 671);
+    	contentPanel = new RoundedJPanel(20, 844, 661);
     		contentPanel.setBackground(Color.WHITE);
     	
+        for(String entry : testEntries) {
+        		JPanel entryPanel = new JPanel();
+        		JLabel name = new JLabel(entry);
+        		entryPanel.add(name);
+        		contentPanel.add(entryPanel);
+        	}
+    		
     	mainPanel.add(menuPanel); mainPanel.add(contentPanel);
     	mainPanel.revalidate();
         mainPanel.repaint();

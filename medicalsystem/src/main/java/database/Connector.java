@@ -8,7 +8,7 @@ public class Connector {
 
 	
 	private static final String connectionUrl =
-		    "jdbc:sqlserver://localhost:1433;databaseName=Medical Assistance System;encrypt=false;user=sa;password=password";
+		    "jdbc:sqlserver://DESKTOP-UJ6DMLF:1433;databaseName=Medical Assistance System;encrypt=false;user=sa;password=password";
 
 	private static final String URL = "jdbc:sqlserver://DESKTOP-UJ6DMLF;Database=Medical Assistance System;IntegratedSecurity=true";
 	private static final String USER = "Nikola";

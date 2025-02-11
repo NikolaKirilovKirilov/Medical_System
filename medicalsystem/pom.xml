@@ -6,6 +6,12 @@
   <version>0.0.1-SNAPSHOT</version>
   
   <dependencies>
+	<dependency>
+    	<groupId>com.microsoft.sqlserver</groupId>
+    	<artifactId>mssql-jdbc</artifactId>
+    	<version>12.8.1.jre11</version>
+	</dependency>
+	
 	  <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
 	<dependency>
     	<groupId>mysql</groupId>

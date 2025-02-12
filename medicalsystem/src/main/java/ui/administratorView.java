@@ -19,6 +19,7 @@ public class administratorView extends JFrame implements ActionListener{
 	
 	static String[] butNames = {"Пациенти", "Лекари", "Болести", "Настройки"};
 	static String[] testEntries = {"entry0", "entry1", "entry2", "entry3"};
+	private String[] doctorFilters = {"By ID", "By Name", "By Specialization"};
 	
 	Color cHeader = new Color(35, 64, 153);
 	
@@ -61,7 +62,7 @@ public class administratorView extends JFrame implements ActionListener{
 
 	        // Create the main work area
 	        mainPanel = new JPanel();
-	        mainPanel.setLayout(new BoxLayout(mainPanel, 2));
+	        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 	        mainPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
 	        add(mainPanel, FlowLayout.CENTER);
 
@@ -70,7 +71,7 @@ public class administratorView extends JFrame implements ActionListener{
 	        patientButton.addActionListener(e -> setPatientPage());
 	        //doctorButton.addActionListener(e -> updateMainPanel("Doctor"));
 	        doctorButton.addActionListener(e -> setDoctorPage());
-	        diseaseButton.addActionListener(e -> updateMainPanel("Disease"));
+	        diseaseButton.addActionListener(e -> setDiseasePage());
 	        settingsButton.addActionListener(e -> updateMainPanel("Settings"));
 	}
 	
@@ -131,7 +132,7 @@ public class administratorView extends JFrame implements ActionListener{
     	mainPanel.removeAll();
     	JLabel label = new JLabel("Height: " + mainPanel.getHeight() + " Width: " + mainPanel.getWidth());
     	label.setHorizontalAlignment(SwingConstants.CENTER);
-    	mainPanel.add(label, BorderLayout.CENTER);
+    	mainPanel.add(label, FlowLayout.CENTER);
     	mainPanel.revalidate();
         mainPanel.repaint();
     	
@@ -146,10 +147,15 @@ public class administratorView extends JFrame implements ActionListener{
     
     private void setDoctorPage() {
     	mainPanel.removeAll();
+    	JComboBox<String> filters = new JComboBox<String>(doctorFilters);
+    	filters.setPreferredSize(new Dimension(10, 30));
     	
     	menuPanel = new RoundedJPanel(20, 417 , 661);
+    		menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
     		menuPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
     		menuPanel.setBackground(new Color(55, 144, 52));
+    		menuPanel.add(new JLabel("Sort"));
+    		menuPanel.add(filters);
     		
     	contentPanel = new RoundedJPanel(20, 844, 661);
     		contentPanel.setBackground(Color.WHITE);
@@ -166,7 +172,42 @@ public class administratorView extends JFrame implements ActionListener{
         mainPanel.repaint();
     }
     
-    private void setDiseasePage() {}
+    private void setDiseasePage() {
+    	
+    	mainPanel.removeAll();
+    	
+    	JButton setButton = new JButton("Set");
+    	JButton cancelButton = new JButton("Cancel");
+    	
+    	JScrollPane listScroller = new JScrollPane();
+    	listScroller.setPreferredSize(new Dimension(250, 80));
+    	listScroller.setAlignmentX(LEFT_ALIGNMENT);
+
+    	//Lay out the label and scroll pane from top to bottom.
+    	JPanel listPane = new JPanel();
+    	listPane.setLayout(new BoxLayout(listPane, BoxLayout.PAGE_AXIS));
+    	JLabel label = new JLabel("Lorem Ipsum");
+    	
+    	listPane.add(label);
+    	listPane.add(Box.createRigidArea(new Dimension(0,5)));
+    	listPane.add(listScroller);
+    	listPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+    	//Lay out the buttons from left to right.
+    	JPanel buttonPane = new JPanel();
+    	buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
+    	buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+    	buttonPane.add(Box.createHorizontalGlue());
+    	buttonPane.add(cancelButton);
+    	buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
+    	buttonPane.add(setButton);
+
+    	//Put everything together, using the content pane's BorderLayout.
+    	mainPanel.add(listPane, BorderLayout.CENTER);
+    	mainPanel.add(buttonPane, BorderLayout.PAGE_END);
+    	mainPanel.revalidate();
+    	mainPanel.repaint();
+    }
     
     private void setSettingsPage() {}
     

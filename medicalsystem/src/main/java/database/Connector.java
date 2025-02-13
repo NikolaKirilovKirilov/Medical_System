@@ -2,50 +2,36 @@ package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Connector {
 
 	
 	private static final String connectionUrl =
-		    "jdbc:sqlserver://DESKTOP-UJ6DMLF:1433;databaseName=Medical Assistance System;encrypt=false;user=sa;password=password";
-
-	private static final String URL = "jdbc:sqlserver://DESKTOP-UJ6DMLF;Database=Medical Assistance System;IntegratedSecurity=true";
-	private static final String USER = "Nikola";
-	private static final String PASSWORD = "";
-
+		    "jdbc:sqlserver://localhost:1433;databaseName=Medical Assistance System;encrypt=false;user=sa;password=parola1010";
 
 	public static Connection getConnection() throws SQLException {
 		return DriverManager.getConnection(connectionUrl);
 	}
 	
-	public static void main(String[] args) {
-    try {
-    	
-    	try (Connection connection = DriverManager.getConnection(connectionUrl)) {
-    		System.out.println("Connection Established!");
-    	}
-    	
-    	} catch (SQLException e) {
-    			System.out.println("Error connction to the database");
-    			e.printStackTrace();
-    		}
-	}
-    
-	/*
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
-    }
+	public static void main(String[] args)
+	{
+		try (Connection conn = DriverManager.getConnection(connectionUrl)) {
+            String query = "SELECT DB_NAME() AS DatabaseName";
+            try (PreparedStatement pstmt = conn.prepareStatement(query);
+                 ResultSet rs = pstmt.executeQuery()) {
 
-    public static void main(String[] args) {
-        try (Connection connection = getConnection()) {
-            if (connection != null) {
-                System.out.println("Connected to the database!");
+                if (rs.next()) {
+                    String databaseName = rs.getString("DatabaseName");
+                    System.out.println("Connected to Database: " + databaseName);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    */
-    
 }
+
+	

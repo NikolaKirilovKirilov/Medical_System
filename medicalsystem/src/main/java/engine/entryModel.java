@@ -8,9 +8,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.*;
 
-import ui.patientView;
-import ui.doctorView;
-import ui.administratorView;
+import database.*;
+import ui.*;
 
 public class entryModel extends JFrame implements ActionListener{
 	
@@ -125,6 +124,9 @@ public class entryModel extends JFrame implements ActionListener{
 		
 		else if(comboBox.getSelectedItem() == "Administrator" && e.getSource() == enter)
 		{
+			Connector connection = new Connector();
+			
+			
 			SwingUtilities.invokeLater(() -> new administratorView());
 			this.setVisible(false);
 			this.dispose();

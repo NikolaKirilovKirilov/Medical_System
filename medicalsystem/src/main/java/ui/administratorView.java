@@ -62,7 +62,7 @@ public class administratorView extends JFrame implements ActionListener{
 
 	        // Create the main work area
 	        mainPanel = new JPanel();
-	        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+	        mainPanel.setLayout(new GridLayout(1, 2, 10, 0));
 	        mainPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
 	        add(mainPanel, FlowLayout.CENTER);
 
@@ -151,7 +151,7 @@ public class administratorView extends JFrame implements ActionListener{
     	filters.setPreferredSize(new Dimension(10, 30));
     	
     	menuPanel = new RoundedJPanel(20, 417 , 661);
-    		menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
+    		menuPanel.setLayout(new GridLayout(0, 1, 5, 5));
     		menuPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
     		menuPanel.setBackground(new Color(55, 144, 52));
     		menuPanel.add(new JLabel("Sort"));
@@ -159,6 +159,7 @@ public class administratorView extends JFrame implements ActionListener{
     		
     	contentPanel = new RoundedJPanel(20, 844, 661);
     		contentPanel.setBackground(Color.WHITE);
+    		contentPanel.setLayout(new GridLayout(0, 1, 5, 5));
     	
         for(String entry : testEntries) {
         		JPanel entryPanel = new JPanel();

@@ -37,4 +37,21 @@ public class RoundedJPanel extends JPanel {
         graphics.setColor(getForeground());
         graphics.drawRoundRect(0, 0, width - 1, height - 1, arcs.width, arcs.height);
     }
+    
+    protected void paintContentComponent(Graphics g) {
+        super.paintComponent(g);
+        Dimension arcs = new Dimension(cornerRadius, cornerRadius);
+        int width = getWidth();
+        int height = 50;
+        Graphics2D graphics = (Graphics2D) g;
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Draws the rounded panel with borders.
+        graphics.setColor(getBackground());
+        graphics.fillRoundRect(0, 0, width - 1, height - 1, arcs.width, arcs.height);
+        graphics.setColor(getForeground());
+        graphics.drawRoundRect(0, 0, width - 1, height - 1, arcs.width, arcs.height);
+    }
+    
+    
 }

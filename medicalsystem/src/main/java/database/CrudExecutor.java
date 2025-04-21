@@ -8,7 +8,7 @@ import java.sql.Statement;
 
 import javax.swing.JComboBox;
 
-public class QueryExecutor {
+public class CrudExecutor {
 
     public static void executeSelectQuery() {
         String query = "SELECT * FROM your_table_name";

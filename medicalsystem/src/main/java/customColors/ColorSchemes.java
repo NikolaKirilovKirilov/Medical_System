@@ -11,9 +11,6 @@ import java.awt.image.ColorModel;
 
 public class ColorSchemes implements Paint, java.io.Serializable{
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	public static final Color BACKGROUND_BEIGE = new Color(242,237,210);

@@ -1,6 +1,6 @@
-package entities;
+package com.example.model;
 
-public class Doctor extends Entity{
+public class Doctor extends User{
 	
 	public String specialization;
 	
@@ -9,7 +9,6 @@ public class Doctor extends Entity{
 	}
 	
 	public Doctor(int id, String name, String specialization, String password) {
-		super(id, name, specialization, password);
 	}
 	
 }

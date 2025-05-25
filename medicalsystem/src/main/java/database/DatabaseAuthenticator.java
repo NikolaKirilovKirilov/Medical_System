@@ -1,19 +1,13 @@
 package database;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-public class DatabaseAuthenticator {
-    
-    // Database connection parameters
-	private static final String connectionUrl =
-		    "jdbc:sqlserver://localhost:1433;databaseName=Medical Assistance System;encrypt=false;user=sa;password=parola1010";
-    
+public class DatabaseAuthenticator {  
     public boolean authenticateUser(JComboBox<String> userTypeComboBox, 
                                   JTextField codeField, 
                                   JTextField usernameField, 
@@ -26,7 +20,7 @@ public class DatabaseAuthenticator {
         
         try {
             // Establish database connection
-            conn = DriverManager.getConnection(connectionUrl);
+            conn = Connector.getConnection();
             
             switch (userType) {
                 case "Administrator":

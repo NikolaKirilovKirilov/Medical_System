@@ -13,14 +13,16 @@ public class Form extends JFrame implements ActionListener{
 	public Form() {
 		this.setTitle("Вход");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setLocationRelativeTo(null);
+
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
+		
+		ImageIcon icon = new ImageIcon(getClass().getResource("/images/MASicon.png"));
+		this.setIconImage(icon.getImage());
+		
 		this.setResizable(false);
 		this.setSize(1200, 390);
 		this.setVisible(false);
-		
-		ImageIcon icon = new ImageIcon("Medical_emblem.png");
-		this.setIconImage(icon.getImage());
-
 	}
 	
 	@Override
@@ -31,50 +33,70 @@ public class Form extends JFrame implements ActionListener{
 
 	
 	//Forms used to insert data
-	public void doctorInsertion() {
+	public void doctorInsertion(int code, String name, String surName, String password) {
+		
+		
 		
 		
 		this.setVisible(true);
 	};
 	
-	public void patientInsertion() {
+	public void specializationInsertion(int code, String name, String description) {
 		
 		
 		this.setVisible(true);
 	};
 	
-	public void illnessInsertion() {
+	public void patientInsertion(int code, String name, String surName, String password) {
 		
 		
 		this.setVisible(true);
 	};
 	
-	public void prescriptionInsertion() {
+	public void illnessInsertion(int code, String name, String description) {
 		
 		
 		this.setVisible(true);
 	};
 	
-	//Forms used to delete data
-	public void doctorDeletion() {
+	public void medicationInsertion(int code, String name, String description, String dosage) {
 		
 		
 		this.setVisible(true);
 	};
 	
-	public void patientDeletion() {
+	public void prescriptionInsertion(int code, int doctorCode, int patientCode, int illnessCode, int medicationCode) {
 		
 		
 		this.setVisible(true);
 	};
 	
-	public void illnessDeletion() {
+	//Forms used to delete data ------------------------------------------------------------------------------------------
+	public void doctorDeletion(int code) {
 		
 		
 		this.setVisible(true);
 	};
 	
-	public void prescriptionDeletion() {
+	public void specializationDeletion(int code) {
+		
+		
+		this.setVisible(true);
+	};
+	
+	public void patientDeletion(int code) {
+		
+		
+		this.setVisible(true);
+	};
+	
+	public void illnessDeletion(int code) {
+		
+		
+		this.setVisible(true);
+	};
+	
+	public void prescriptionDeletion(int code) {
 		
 		
 		this.setVisible(true);

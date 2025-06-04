@@ -19,7 +19,7 @@ public class patientView extends JFrame implements ActionListener{
 		this.setResizable(false);
 		this.setVisible(true);
 		
-		ImageIcon icon = new ImageIcon("Medical_emblem.png");
+		ImageIcon icon = new ImageIcon(getClass().getResource("/images/MASicon.png"));
 		this.setIconImage(icon.getImage());
 	}
 	

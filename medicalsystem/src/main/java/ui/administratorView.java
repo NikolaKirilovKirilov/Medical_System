@@ -3,27 +3,20 @@ package ui;
 import java.awt.*;
 import java.awt.event.*; 
 import javax.swing.*;
-import javax.swing.border.*;
-import database.*;
 import customColors.*;
-import uiComponents.*;
+import uiComponents.Form;
 
 public class administratorView extends JFrame implements ActionListener{
+	private static final long serialVersionUID = 1L;
 	
 	JFrame frame;
-	JPanel mainPanel;
-	JPanel headerPanel;
-	RoundedJPanel menuPanel;
-	RoundedJPanel contentPanel;
-	
-	static String[] butNames = {"Пациенти", "Лекари", "Болести", "Настройки"};
-	static String[] testEntries = {"entry0", "entry1", "entry2", "entry3"};
+	JPanel headerPanel, mainPanel, menuPanel, contentPanel;
+    Color headerColor = ColorSchemes.MENU_GREEN, hoverBackgroundColor = Color.DARK_GRAY, hoverTextColor = Color.WHITE;
+    
+    Form caller;
+    
+	static String[] testEntries = {"entry0", "entry1", "entry2", "entry3", "entry4", "entry5", "entry6", "entry7", "entry8", "entry9", "entry10", "entry11"};
 	private String[] doctorFilters = {"By ID", "By Name", "By Specialization"};
-	
-	Color cHeader = new Color(35, 64, 153);
-	
-	private static final long serialVersionUID = 1L;
-	String instance;
 	
 	public administratorView() {
 		this.setTitle("Hello Administrator");
@@ -35,15 +28,13 @@ public class administratorView extends JFrame implements ActionListener{
 		ImageIcon icon = new ImageIcon(getClass().getResource("/images/MASicon.png"));
 		this.setIconImage(icon.getImage());
 		
+		caller = new Form();
 		//-------------------------------------------------------------------------------------------------------------------------------------------------------
+
 		
 		 headerPanel = new JPanel();
 	        headerPanel.setLayout(new GridLayout(1, 4));
 	        headerPanel.setBackground(new Color(82,194,34));
-
-	        Color headerColor = ColorSchemes.MENU_GREEN;
-	        Color hoverBackgroundColor = Color.DARK_GRAY;
-	        Color hoverTextColor = Color.WHITE;
 	        
 	        JButton patientButton = createStyledButton("Patient", headerColor, hoverBackgroundColor, hoverTextColor);
 	        JButton doctorButton = createStyledButton("Doctor", headerColor, hoverBackgroundColor, hoverTextColor);
@@ -129,84 +120,217 @@ public class administratorView extends JFrame implements ActionListener{
     private void setPatientPage() {
     	
     	mainPanel.removeAll();
-    	JLabel label = new JLabel("Height: " + mainPanel.getHeight() + " Width: " + mainPanel.getWidth());
-    	label.setHorizontalAlignment(SwingConstants.CENTER);
-    	mainPanel.add(label, FlowLayout.CENTER);
-    	mainPanel.revalidate();
-        mainPanel.repaint();
-    	
-    	for(String entry : testEntries)
-    	{
-    		JPanel entryPanel = new JPanel();
-    		JLabel name = new JLabel(entry);
-    		entryPanel.add(name);
-    		contentPanel.add(entryPanel);
-    	}
+        mainPanel.setLayout(new GridBagLayout());
+
+        // Panels
+        menuPanel = new JPanel();
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));  // vertical stack
+
+        menuPanel.setBackground(ColorSchemes.MENU_GREEN);
+        contentPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
+
+        // Scrollable contentPanel wrapper
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);  // smoother scrolling
+
+        // Example control in menuPanel
+        JComboBox<String> filters = new JComboBox<>(doctorFilters);
+        filters.setPreferredSize(new Dimension(150, 30));
+        menuPanel.add(new JLabel("Sort by:"));
+        menuPanel.add(filters);
+        
+        // === TOP BUTTONS ===
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(1, 2, 10, 0)); // 1 row, 2 columns, 10px horizontal gap
+        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        
+        JButton insertButton = createStyledButton("Insert Patient", headerColor, hoverBackgroundColor, hoverTextColor);
+        JButton deleteButton = createStyledButton("Delete Patient", headerColor, hoverBackgroundColor, hoverTextColor);
+
+        buttonPanel.add(insertButton);
+        buttonPanel.add(deleteButton);
+
+        contentPanel.add(Box.createVerticalStrut(10)); // top spacing
+        contentPanel.add(buttonPanel);
+        contentPanel.add(Box.createVerticalStrut(10)); // spacing after buttons
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+
+        // MenuPanel - 1/3 of the width
+        gbc.gridx = 0;
+        gbc.weightx = 0.25;
+        mainPanel.add(menuPanel, gbc);
+
+        // ScrollPane with contentPanel - 2/3 of the width
+        gbc.gridx = 1;
+        gbc.weightx = 0.75;
+        mainPanel.add(scrollPane, gbc);
+
+        // Add equal-height entries
+        for (String entry : testEntries) {
+            JPanel entryPanel = new JPanel();
+            entryPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300)); // fixed height
+            entryPanel.setPreferredSize(new Dimension(400, 300));
+            entryPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+            entryPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+            entryPanel.add(new JLabel(entry));
+            contentPanel.add(entryPanel);
+        }
+
+        mainPanel.revalidate();
+        mainPanel.repaint();    
     }
+    
     
     private void setDoctorPage() {
     	mainPanel.removeAll();
-    	JComboBox<String> filters = new JComboBox<String>(doctorFilters);
-    	filters.setPreferredSize(new Dimension(10, 30));
-    	
-    	menuPanel = new RoundedJPanel(20, 417 , 661);
-    		menuPanel.setLayout(new GridLayout(0, 1, 5, 5));
-    		menuPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-    		menuPanel.setBackground(new Color(55, 144, 52));
-    		menuPanel.add(new JLabel("Sort"));
-    		menuPanel.add(filters);
-    		
-    	contentPanel = new RoundedJPanel(20, 844, 661);
-    		contentPanel.setBackground(Color.WHITE);
-    		contentPanel.setLayout(new GridLayout(0, 1, 5, 5));
-    	
-        for(String entry : testEntries) {
-        		JPanel entryPanel = new JPanel();
-        		JLabel name = new JLabel(entry);
-        		entryPanel.add(name);
-        		contentPanel.add(entryPanel);
-        	}
-    		
-    	mainPanel.add(menuPanel); mainPanel.add(contentPanel);
-    	mainPanel.revalidate();
+        mainPanel.setLayout(new GridBagLayout());
+
+        // Panels
+        menuPanel = new JPanel();
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));  // vertical stack
+
+        menuPanel.setBackground(ColorSchemes.MENU_GREEN);
+        contentPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
+
+        // Scrollable contentPanel wrapper
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);  // smoother scrolling
+
+        // Example control in menuPanel
+        JComboBox<String> filters = new JComboBox<>(doctorFilters);
+        filters.setPreferredSize(new Dimension(150, 30));
+        menuPanel.add(new JLabel("Sort by:"));
+        menuPanel.add(filters);
+        
+        // === TOP BUTTONS ===
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(1, 2, 10, 0)); // 1 row, 2 columns, 10px horizontal gap
+        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        
+        JButton insertButton = createStyledButton("Insert Doctor", headerColor, hoverBackgroundColor, hoverTextColor);
+        insertButton.addActionListener(e -> caller.doctorInsertion());
+        
+        JButton deleteButton = createStyledButton("Delete Doctor", headerColor, hoverBackgroundColor, hoverTextColor);
+
+        buttonPanel.add(insertButton);
+        buttonPanel.add(deleteButton);
+
+        contentPanel.add(Box.createVerticalStrut(10)); // top spacing
+        contentPanel.add(buttonPanel);
+        contentPanel.add(Box.createVerticalStrut(10)); // spacing after buttons
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+
+        // MenuPanel - 1/3 of the width
+        gbc.gridx = 0;
+        gbc.weightx = 0.25;
+        mainPanel.add(menuPanel, gbc);
+
+        // ScrollPane with contentPanel - 2/3 of the width
+        gbc.gridx = 1;
+        gbc.weightx = 0.75;
+        mainPanel.add(scrollPane, gbc);
+
+        // Add equal-height entries
+        for (String entry : testEntries) {
+            JPanel entryPanel = new JPanel();
+            entryPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300)); // fixed height
+            entryPanel.setPreferredSize(new Dimension(400, 300));
+            entryPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+            entryPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+            entryPanel.add(new JLabel(entry));
+            contentPanel.add(entryPanel);
+        }
+
+        mainPanel.revalidate();
         mainPanel.repaint();
     }
     
     private void setDiseasePage() {
     	
     	mainPanel.removeAll();
-    	
-    	JButton setButton = new JButton("Set");
-    	JButton cancelButton = new JButton("Cancel");
-    	
-    	JScrollPane listScroller = new JScrollPane();
-    	listScroller.setPreferredSize(new Dimension(250, 80));
-    	listScroller.setAlignmentX(LEFT_ALIGNMENT);
+        mainPanel.setLayout(new GridBagLayout());
 
-    	//Lay out the label and scroll pane from top to bottom.
-    	JPanel listPane = new JPanel();
-    	listPane.setLayout(new BoxLayout(listPane, BoxLayout.PAGE_AXIS));
-    	JLabel label = new JLabel("Lorem Ipsum");
-    	
-    	listPane.add(label);
-    	listPane.add(Box.createRigidArea(new Dimension(0,5)));
-    	listPane.add(listScroller);
-    	listPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        // Panels
+        menuPanel = new JPanel();
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));  // vertical stack
 
-    	//Lay out the buttons from left to right.
-    	JPanel buttonPane = new JPanel();
-    	buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
-    	buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-    	buttonPane.add(Box.createHorizontalGlue());
-    	buttonPane.add(cancelButton);
-    	buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
-    	buttonPane.add(setButton);
+        menuPanel.setBackground(ColorSchemes.MENU_GREEN);
+        contentPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
 
-    	//Put everything together, using the content pane's BorderLayout.
-    	mainPanel.add(listPane, BorderLayout.CENTER);
-    	mainPanel.add(buttonPane, BorderLayout.PAGE_END);
-    	mainPanel.revalidate();
-    	mainPanel.repaint();
+        // Scrollable contentPanel wrapper
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);  // smoother scrolling
+
+        // Example control in menuPanel
+        JComboBox<String> filters = new JComboBox<>(doctorFilters);
+        filters.setPreferredSize(new Dimension(150, 30));
+        menuPanel.add(new JLabel("Sort by:"));
+        menuPanel.add(filters);
+        
+        // === TOP BUTTONS ===
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(1, 2, 10, 0)); // 1 row, 2 columns, 10px horizontal gap
+        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        
+        JButton insertButton = createStyledButton("Insert Disease", headerColor, hoverBackgroundColor, hoverTextColor);
+        insertButton.addActionListener(filters);
+        
+        JButton deleteButton = createStyledButton("Delete Disease", headerColor, hoverBackgroundColor, hoverTextColor);
+
+        
+        
+        buttonPanel.add(insertButton);
+        buttonPanel.add(deleteButton);
+
+        contentPanel.add(Box.createVerticalStrut(10)); // top spacing
+        contentPanel.add(buttonPanel);
+        contentPanel.add(Box.createVerticalStrut(10)); // spacing after buttons
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+
+        // MenuPanel - 1/3 of the width
+        gbc.gridx = 0;
+        gbc.weightx = 0.25;
+        mainPanel.add(menuPanel, gbc);
+
+        // ScrollPane with contentPanel - 2/3 of the width
+        gbc.gridx = 1;
+        gbc.weightx = 0.75;
+        mainPanel.add(scrollPane, gbc);
+
+        // Add equal-height entries
+        for (String entry : testEntries) {
+            JPanel entryPanel = new JPanel();
+            entryPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300)); // fixed height
+            entryPanel.setPreferredSize(new Dimension(400, 300));
+            entryPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+            entryPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+            entryPanel.add(new JLabel(entry));
+            contentPanel.add(entryPanel);
+        }
+
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
     
     private void setSettingsPage() {}

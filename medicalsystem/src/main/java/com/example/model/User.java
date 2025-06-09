@@ -6,10 +6,37 @@ import jakarta.persistence.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @Column(nullable = false)
     private String name;
 
-    // Getters and Setters
+	private String surname, specialization;
+	
+	public User() {
+	}
+	
+	public User(String id, String name, String surname, String specialization) {
+		this.id = id;
+		this.name = name;
+		this.surname = surname;
+		this.specialization = specialization;
+	}
+	
+	public String getId() {
+		return this.id;
+	}
+	
+	public String getName() {
+		return this.name;
+	}
+	
+	public String getSurname() {
+		return this.surname;
+	}
+	
+	public String getspecialization() {
+		return this.specialization;
+	
+	}
 }

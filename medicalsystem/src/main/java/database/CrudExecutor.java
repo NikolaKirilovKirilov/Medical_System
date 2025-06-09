@@ -31,27 +31,6 @@ public class CrudExecutor {
         }
     }
     
-    public static void LogInQuery(JComboBox<String> combobox) {
-        String query = "SELECT * FROM Admin";
-
-        try (Connection connection = Connector.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-
-            while (resultSet.next()) {
-                // Retrieve data by column name or index
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-
-                // Display values
-                System.out.println("ID: " + id);
-                System.out.println("Name: " + name);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
     public static void newPatient(String code, String name, String surname, String password)
     {
         String insertQuery = "INSERT INTO Patient (PatientCode, PatientName, PatientSurname, Password) VALUES (?, ?, ?, ?)";
@@ -124,48 +103,5 @@ public class CrudExecutor {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-    
-    public static void getSpecialization(String code) 
-    {
-    	String deleteQuery = "SELECT * FROM Specialization, SpecializationDoctor WHERE SpecializationDoctor.DoctorCode IN (SELECT DoctorCode FROM Doctor WHERE DoctorCode = ?)";
-
-        try (Connection connection = Connector.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
-
-            preparedStatement.setString(1, code);
-
-            int rowsAffected = preparedStatement.executeUpdate();
-            System.out.println("Rows deleted: " + rowsAffected);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public static void getPrescription()
-    {
-    	
-    }
-    
-    public static void getIllnesData(String code)
-    {
-    	String deleteQuery = "Select * FROM Illness WHERE IllnessCode = ?";
-
-        try (Connection connection = Connector.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
-
-            preparedStatement.setString(1, code);
-
-            int rowsAffected = preparedStatement.executeUpdate();
-            System.out.println("Rows deleted: " + rowsAffected);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    	public static void main(String[] args) {
-    		executeSelectQuery();
-    	}
-    }
+    }   
+}

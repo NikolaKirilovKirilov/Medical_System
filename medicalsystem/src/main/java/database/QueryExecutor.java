@@ -1,6 +1,8 @@
 package database;
 
+import java.util.*;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,10 +10,24 @@ import java.sql.Statement;
 
 import javax.swing.JComboBox;
 
-public class QueryExecutor {
+import com.example.model.*;
 
+public class QueryExecutor {
+	
+	static ArrayList<User> entries = new ArrayList<User>();
+	static Administrator admin;
+	static Doctor doc;
+	static Patient patient;
+	
+	
+	public QueryExecutor()
+	{
+		
+	}
+	
+	
     public static void executeSelectQuery() {
-        String query = "SELECT * FROM your_table_name";
+        String query = "SELECT * FROM admin";
 
         try (Connection connection = Connector.getConnection();
              Statement statement = connection.createStatement();
@@ -72,17 +88,16 @@ public class QueryExecutor {
         }
     }
 
-    public static void newDoctor(String code, String name, String surname, String password)
+    public static void newDoctor(String name, String surname, String password)
     {
-        String insertQuery = "INSERT INTO Doctor (DoctorCode, DoctorName, DoctorSurname, Password) VALUES (?, ?, ?, ?)";
+        String insertQuery = "INSERT INTO Doctor (DoctorName, DoctorSurname, Password) VALUES (?, ?, ?)";
 
         try (Connection connection = Connector.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
 
-            preparedStatement.setString(1, code);
-            preparedStatement.setString(2, name);
-            preparedStatement.setString(3, surname);
-            preparedStatement.setString(4, password);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, surname);
+            preparedStatement.setBytes(3, password.getBytes());
 
             int rowsAffected = preparedStatement.executeUpdate();
             System.out.println("Rows inserted: " + rowsAffected);
@@ -165,7 +180,26 @@ public class QueryExecutor {
         }
     }
     
-    	public static void main(String[] args) {
-    		executeSelectQuery();
-    	}
+    public static ArrayList<User> getAllDoctors() {
+    	entries.clear();
+    	String query = "SELECT DoctorCode, DoctorName, DoctorSurname, Password FROM Doctor";
+
+        try (Connection conn = Connector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String doctorCode = rs.getString("DoctorCode");
+                String doctorName = rs.getString("DoctorName");
+                String doctorSurname = rs.getString("DoctorSurname");
+                String doctorPassword = rs.getString("Password");
+                entries.add(new User(doctorCode, doctorName, doctorSurname, doctorPassword));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return entries;
     }
+}

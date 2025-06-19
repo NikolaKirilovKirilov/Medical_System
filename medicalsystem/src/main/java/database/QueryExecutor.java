@@ -25,48 +25,7 @@ public class QueryExecutor {
 		
 	}
 	
-	
-    public static void executeSelectQuery() {
-        String query = "SELECT * FROM admin";
-
-        try (Connection connection = Connector.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-
-            while (resultSet.next()) {
-                // Retrieve data by column name or index
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-
-                // Display values
-                System.out.println("ID: " + id);
-                System.out.println("Name: " + name);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public static void LogInQuery(JComboBox<String> combobox) {
-        String query = "SELECT * FROM Admin";
-
-        try (Connection connection = Connector.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-
-            while (resultSet.next()) {
-                // Retrieve data by column name or index
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-
-                // Display values
-                System.out.println("ID: " + id);
-                System.out.println("Name: " + name);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+	//-----------------------------------------------------Insertion Queries----------------------------------------------------------------------------------------
     
     public static void newPatient(String code, String name, String surname, String password)
     {
@@ -106,6 +65,8 @@ public class QueryExecutor {
             e.printStackTrace();
         }
     }
+   
+	//-----------------------------------------------------Deletion Queries----------------------------------------------------------------------------------------
     
     public static void delPatient(String code)
     {
@@ -140,6 +101,8 @@ public class QueryExecutor {
             e.printStackTrace();
         }
     }
+    
+	//-----------------------------------------------------Get Data Queries----------------------------------------------------------------------------------------
     
     public static void getSpecialization(String code) 
     {
@@ -182,18 +145,39 @@ public class QueryExecutor {
     
     public static ArrayList<User> getAllDoctors() {
     	entries.clear();
-    	String query = "SELECT DoctorCode, DoctorName, DoctorSurname, Password FROM Doctor";
+    	String query = "SELECT DoctorCode, DoctorName, DoctorSurname FROM Doctor";
 
         try (Connection conn = Connector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                String doctorCode = rs.getString("DoctorCode");
+                int doctorCode = rs.getInt("DoctorCode");
                 String doctorName = rs.getString("DoctorName");
                 String doctorSurname = rs.getString("DoctorSurname");
-                String doctorPassword = rs.getString("Password");
-                entries.add(new User(doctorCode, doctorName, doctorSurname, doctorPassword));
+                entries.add(new Doctor(doctorCode, doctorName, doctorSurname));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return entries;
+    }
+    
+    public static ArrayList<User> getAllPatients() {
+    	entries.clear();
+    	String query = "SELECT PatientCode, PatientName, PatientSurname FROM Patient";
+
+        try (Connection conn = Connector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                int patientCode = rs.getInt("PatientCode");
+                String patientName = rs.getString("PatientName");
+                String patientSurname = rs.getString("PatientSurname");
+                entries.add(new Patient(patientCode, patientName, patientSurname));
             }
 
         } catch (SQLException e) {

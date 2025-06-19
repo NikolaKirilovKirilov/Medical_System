@@ -19,8 +19,7 @@ public class administratorView extends JFrame implements ActionListener{
     Form caller;
     
     static ArrayList<User> entries;
-	static String[] testEntries = {"entry0", "entry1", "entry2", "entry3", "entry4", "entry5", "entry6", "entry7", "entry8", "entry9", "entry10", "entry11"};
-	private String[] doctorFilters = {"By ID", "By Name", "By Specialization"};
+	private String[] doctorFilters = {"ID", "Name", "Specialization"};
 	
 	
 	public administratorView() {
@@ -156,17 +155,23 @@ public class administratorView extends JFrame implements ActionListener{
         	case"Patient":
         		insertButton.addActionListener(e -> caller.patientInsertion());
         		deleteButton.addActionListener(e -> caller.patientDeletion());
+        		entries = QueryExecutor.getAllPatients();
+        		break;
         	case"Doctor":
         		insertButton.addActionListener(e -> caller.doctorInsertion());
         		deleteButton.addActionListener(e -> caller.doctorDeletion());
         		entries = QueryExecutor.getAllDoctors();
-        		System.out.println(entries.get(1).getName());
+        		break;
         	case"Disease":
         		insertButton.addActionListener(e -> caller.diseaseInsertion());
         		deleteButton.addActionListener(e -> caller.diseaseDeletion());
+        		
+        		break;
         	case"Medication":
         		insertButton.addActionListener(e -> caller.medicationInsertion());
         		deleteButton.addActionListener(e -> caller.medicationDeletion());
+        		
+        		break;
         }
         
         contentButtonPanel.add(insertButton);
@@ -189,18 +194,50 @@ public class administratorView extends JFrame implements ActionListener{
         mainPanel.add(scrollPane, gbc);
     	
         // Add equal-height entries
+        /*
         	for (User entry : entries) {
-            	JPanel entryPanel = new JPanel();
-            	entryPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300)); // fixed height
-            	entryPanel.setPreferredSize(new Dimension(400, 300));
-            	entryPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-            	entryPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-            	entryPanel.add(new JLabel("Doctor's ID: " + entry.getId()));
-            	entryPanel.add(new JLabel("Doctor's Name: " + entry.getName()));
-            	entryPanel.add(new JLabel("Doctor's Surname: " + entry.getSurname()));
-            	entryPanel.add(new JLabel("Doctor's Sepcialization: " + entry.getspecialization()));
+        		JPanel entryPanel = new JPanel();
+        		entryPanel.setLayout(new BoxLayout(entryPanel, BoxLayout.Y_AXIS));
+        		entryPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+
+        		// This allows it to grow horizontally but adapt height to content
+        		entryPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        		entryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);  // Optional: aligns nested panels to left
+
+            	if (entry instanceof Doctor)
+            	{
+            		Doctor doc = (Doctor) entry;
+            		entryPanel.add(new JLabel("Doctor's ID: " + doc.getId()));
+            		entryPanel.add(new JLabel("Doctor's Name: " + doc.getName()));
+            		entryPanel.add(new JLabel("Doctor's Surname: " + doc.getSurname()));
+            	}
             	contentPanel.add(entryPanel);
         	}
+        	*/
+        
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS)); // Ensure parent stacks entries
+
+        for (User entry : entries) {
+            JPanel entryPanel = new JPanel();
+            entryPanel.setLayout(new BoxLayout(entryPanel, BoxLayout.Y_AXIS));
+            entryPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.LIGHT_GRAY),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10) // Padding inside each entry
+            ));
+
+            // Align panel and let it grow horizontally, shrink to fit vertically
+            entryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            if (entry instanceof Doctor) {
+            	Doctor doc = (Doctor) entry;
+                entryPanel.add(new JLabel("Doctor's ID: " + doc.getId()));
+                entryPanel.add(new JLabel("Doctor's Name: " + doc.getName()));
+                entryPanel.add(new JLabel("Doctor's Surname: " + doc.getSurname()));
+            }
+
+            contentPanel.add(Box.createVerticalStrut(10)); // Add spacing between entries
+            contentPanel.add(entryPanel);
+        }
 
         mainPanel.revalidate();
         mainPanel.repaint();    

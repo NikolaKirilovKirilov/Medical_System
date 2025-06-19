@@ -1,21 +1,19 @@
 package com.example.model;
 
-public class Doctor extends User{
+public class Doctor implements User{
 	
-	private String id, name, surname, specialization;
+	private int id;
+	private String name, surname;
 	
-	public Doctor() {
-		super();
-	}
+	public Doctor() {};
 	
-	public Doctor(String id, String name, String surname, String specialization) {
+	public Doctor(int id, String name, String surname) {
 		this.id = id;
 		this.name = name;
 		this.surname = surname;
-		this.specialization = specialization;
 	}
 	
-	public String getId() {
+	public int getId() {
 		return this.id;
 	}
 	
@@ -27,7 +25,15 @@ public class Doctor extends User{
 		return this.surname;
 	}
 	
-	public String getspecialization() {
-		return this.specialization;
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public void setSurname(String surname) {
+		this.surname = surname;
 	}
 }

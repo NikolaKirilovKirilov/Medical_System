@@ -1,0 +1,26 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+    "http://hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- JDBC connection settings -->
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:sqlserver://localhost:1433;databaseName=Medical Assistance System</property>
+        <property name="hibernate.connection.username">sa</property>
+        <property name="hibernate.connection.password">parola1010</property>
+
+        <!-- SQL dialect -->
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</property>
+
+        <!-- Show SQL in console -->
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+
+        <!-- Auto schema update -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- Annotated classes -->
+        <mapping class="com.example.model.YourEntity"/>
+    </session-factory>
+</hibernate-configuration>

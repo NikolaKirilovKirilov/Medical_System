@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
+import java.sql.SQLException;
+import java.util.Objects;
 
 import javax.swing.*;
 
@@ -13,8 +16,9 @@ import ui.*;
 
 public class EntryPanel extends JFrame implements ActionListener {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
-	private String[] positions = { "Patient", "Doctor", "Administrator" };
+	private final String[] positions = { "Пациент", "Доктор", "Администратор" };
 
 	DatabaseAuthenticator authenticator = new DatabaseAuthenticator();
 
@@ -30,7 +34,7 @@ public class EntryPanel extends JFrame implements ActionListener {
 		this.setResizable(false);
 		this.setSize(300, 290);
 
-		ImageIcon icon = new ImageIcon(getClass().getResource("/images/MASicon.png"));
+		ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/images/MASicon.png")));
 		this.setIconImage(icon.getImage());
 
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -58,7 +62,7 @@ public class EntryPanel extends JFrame implements ActionListener {
 
 		enter.setBounds(90, 200, 100, 30);
 		enter.addActionListener(this);
-		enter.setText("ENTER");
+		enter.setText("ВХОД");
 		enter.setFocusable(false);
 		enter.setBackground(Color.WHITE);
 
@@ -76,20 +80,20 @@ public class EntryPanel extends JFrame implements ActionListener {
 	{
 		if(e.getSource() == comboBox)
 		{
-			if(comboBox.getSelectedItem() == "Patient")
+			if(comboBox.getSelectedItem() == "Пациент")
 			{
 				name.setVisible(true);
 				code.setVisible(false);
 				password.setVisible(true);
 			}
-			else if(comboBox.getSelectedItem() == "Doctor")
+			else if(comboBox.getSelectedItem() == "Доктор")
 			{
 				name.setVisible(false);
 				code.setVisible(true);
 				password.setVisible(true);
 
 			}
-			else if(comboBox.getSelectedItem() == "Administrator")
+			else if(comboBox.getSelectedItem() == "Администратор")
 			{
 				name.setVisible(false);
 				code.setVisible(true);
@@ -98,23 +102,35 @@ public class EntryPanel extends JFrame implements ActionListener {
 		}
 		
 		if(e.getSource() == enter && authenticator.authenticateUser(comboBox, code, name, password)) {
-			if(comboBox.getSelectedItem() == "Patient" && e.getSource() == enter)
+			if(comboBox.getSelectedItem() == "Пациент" && e.getSource() == enter)
 			{
-				SwingUtilities.invokeLater(() -> new patientView());
+				SwingUtilities.invokeLater(() -> {
+                    try {
+                        new patientView(name.getText().trim(), password.getPassword());
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
 				this.setVisible(false);
 				this.dispose();
 			}
 		
-			else if(comboBox.getSelectedItem() == "Doctor" && e.getSource() == enter)
+			else if(comboBox.getSelectedItem() == "Доктор" && e.getSource() == enter)
 			{
 				SwingUtilities.invokeLater(() -> new doctorView());
 				this.setVisible(false);
 				this.dispose();
 			}
 		
-			else if(comboBox.getSelectedItem() == "Administrator" && e.getSource() == enter)
+			else if(comboBox.getSelectedItem() == "Администратор" && e.getSource() == enter)
 			{
-				SwingUtilities.invokeLater(() -> new administratorView());
+				SwingUtilities.invokeLater(() -> {
+                    try {
+                        new administratorView(Integer.parseInt(code.getText().trim()));
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
 				this.setVisible(false);
 				this.dispose();
 			}

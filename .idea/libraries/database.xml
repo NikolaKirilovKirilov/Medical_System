@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="database">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/medicalsystem/src/main/java" />
+    </SOURCES>
+  </library>
+</component>

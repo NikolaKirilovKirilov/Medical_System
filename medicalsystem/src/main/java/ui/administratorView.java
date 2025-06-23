@@ -1,118 +1,89 @@
 package ui;
 
+import java.io.Serial;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 import javax.swing.*;
 import customColors.*;
 import com.example.model.*;
 import database.QueryExecutor;
 import uiComponents.Form;
+import uiComponents.StyledComponents;
 
-public class administratorView extends JFrame implements ActionListener{
+public class administratorView extends JFrame implements ActionListener {
+	@Serial
 	private static final long serialVersionUID = 1L;
-	
+
+	Administrator admin;
+
 	JFrame frame;
-	JPanel  mainPanel, headerPanel, menuPanel, contentPanel, contentButtonPanel;
-    Color headerColor = ColorSchemes.MENU_GREEN, hoverBackgroundColor = Color.DARK_GRAY, hoverTextColor = Color.WHITE;
-    
-    Form caller;
-    
-    static ArrayList<User> entries;
-	private String[] doctorFilters = {"ID", "Name", "Specialization"};
-	
-	
-	public administratorView() {
-		this.setTitle("Hello Administrator");
+	JPanel mainPanel, headerPanel, menuPanel, contentPanel, contentButtonPanel;
+	StyledComponents sc;
+	Color headerColor = ColorSchemes.MENU_GREEN, hoverBackgroundColor = Color.DARK_GRAY, hoverTextColor = Color.WHITE;
+	Form caller;
+
+	static ArrayList<com.example.model.User> entries;
+	final private String[] doctorOptions = { "Код", "Име", "Специализация" };
+	final private String[] patDisMedOptions = { "Код", "Име"};
+
+
+	public administratorView(int code) throws SQLException {
+		admin = QueryExecutor.getAdministratorByCode(code);
+
+		this.setTitle("Здравейте Администратор: " + admin.getCode());
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setResizable(false);
 		this.setVisible(true);
-		
-		ImageIcon icon = new ImageIcon(getClass().getResource("/images/MASicon.png"));
+
+		ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/images/MASicon.png")));
 		this.setIconImage(icon.getImage());
-		
+
 		initializePanels();
-		
+		sc = new StyledComponents();
 		caller = new Form();
-		//-------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		
-		 headerPanel = new JPanel();
-	        headerPanel.setLayout(new GridLayout(1, 4));
-	        headerPanel.setBackground(new Color(82,194,34));
-	        
-	        JButton patientButton = createStyledButton("Patient", headerColor, hoverBackgroundColor, hoverTextColor);
-	        JButton doctorButton = createStyledButton("Doctor", headerColor, hoverBackgroundColor, hoverTextColor);
-	        JButton diseaseButton = createStyledButton("Disease", headerColor, hoverBackgroundColor, hoverTextColor);
-	        JButton medicationButton = createStyledButton("Medication", headerColor, hoverBackgroundColor, hoverTextColor);
-	        JButton settingsButton = createStyledButton("Settings", headerColor, hoverBackgroundColor, hoverTextColor);
+		// -------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	        // Add buttons to the header panel
-	        headerPanel.add(patientButton);
-	        headerPanel.add(doctorButton);
-	        headerPanel.add(diseaseButton);
-	        headerPanel.add(medicationButton);
-	        headerPanel.add(settingsButton);
+		headerPanel = new JPanel();
+		headerPanel.setLayout(new GridLayout(1, 4));
+		headerPanel.setBackground(new Color(82, 194, 34));
 
-	        // Add the header panel to the JFrame
-	        add(headerPanel, BorderLayout.NORTH);
+		JButton patientButton = sc.createStyledButton("Пациенти", headerColor, hoverBackgroundColor, hoverTextColor);
+		JButton doctorButton = sc.createStyledButton("Доктори", headerColor, hoverBackgroundColor, hoverTextColor);
+		JButton diseaseButton = sc.createStyledButton("Заболявания", headerColor, hoverBackgroundColor, hoverTextColor);
+		JButton medicationButton = sc.createStyledButton("Медикаменти", headerColor, hoverBackgroundColor, hoverTextColor);
+		JButton settingsButton = sc.createStyledButton("Настройки", headerColor, hoverBackgroundColor, hoverTextColor);
 
-	        // Create the main work area
+		// Add buttons to the header panel
+		headerPanel.add(patientButton);
+		headerPanel.add(doctorButton);
+		headerPanel.add(diseaseButton);
+		headerPanel.add(medicationButton);
+		headerPanel.add(settingsButton);
 
-	        add(mainPanel, FlowLayout.CENTER);
+		// Add the header panel to the JFrame
+		add(headerPanel, BorderLayout.NORTH);
 
-	        // Set action listeners for the buttons
-	        // patientButton.addActionListener(e -> updateMainPanel("Patient"));
-	        
-	        /*
-	        patientButton.addActionListener(e -> setPatientPage());
-	        doctorButton.addActionListener(e -> setDoctorPage());
-	        diseaseButton.addActionListener(e -> setDiseasePage());
-	        medicationButton.addActionListener(e -> setMedicationPage());
-	        settingsButton.addActionListener(e -> updateMainPanel("Settings"));
-	        */
-	        patientButton.addActionListener(e -> setDbExplotationPage("Patient"));
-	        doctorButton.addActionListener(e -> setDbExplotationPage("Doctor"));
-	        diseaseButton.addActionListener(e -> setDbExplotationPage("Disease"));
-	        medicationButton.addActionListener(e -> setDbExplotationPage("Medicine"));
-	        settingsButton.addActionListener(e ->  setSettingsPage());
+		// Create the main work area
+
+		add(mainPanel, FlowLayout.CENTER);
+
+		patientButton.addActionListener(e -> setDbExploitationPage("Пациент"));
+		doctorButton.addActionListener(e -> setDbExploitationPage("Доктор"));
+		diseaseButton.addActionListener(e -> setDbExploitationPage("Заболяване"));
+		medicationButton.addActionListener(e -> setDbExploitationPage("Медикамент"));
+		settingsButton.addActionListener(e -> setSettingsPage());
 	}
-	
+
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		
-	}
-	
-	 private JButton createStyledButton(String text, Color backgroundColor, Color hoverBackgroundColor, Color hoverTextColor) {
-	        JButton button = new JButton(text);
-	        button.setBackground(backgroundColor);
-	        button.setForeground(Color.BLACK);
-	        button.setBorderPainted(false);
-	        button.setFocusPainted(false);
-	        button.setOpaque(true);
-	        //                 .,/
-	        button.setFont(new Font("Arial", Font.BOLD, 14));
+	public void actionPerformed(ActionEvent e) { };
 
-	        // Add hover effects
-	        button.addMouseListener(new MouseAdapter() {
-	            @Override
-	            public void mouseEntered(MouseEvent e) {
-	                button.setBackground(hoverBackgroundColor);
-	                button.setForeground(hoverTextColor);
-	            }
-
-	            @Override
-	            public void mouseExited(MouseEvent e) {
-	                button.setBackground(backgroundColor);
-	                button.setForeground(Color.BLACK);
-	            }
-	        });
-
-	        return button;
-	    }
-    
-	 private void initializePanels() {
+	private void initializePanels() {
 	        mainPanel = new JPanel();
 	        mainPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
 	        mainPanel.setLayout(new GridBagLayout());
@@ -128,128 +99,134 @@ public class administratorView extends JFrame implements ActionListener{
 	        contentButtonPanel.setLayout(new GridLayout(1, 2)); // 1 row, 2 columns
 	        contentButtonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 	 }
-	 
-    private void setDbExplotationPage(String instance) {
-    	mainPanel.removeAll();
-        menuPanel.removeAll();
-        contentPanel.removeAll();
-        contentButtonPanel.removeAll();
 
-        // Scrollable contentPanel wrapper
-        JScrollPane scrollPane = new JScrollPane(contentPanel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);  // smoother scrolling
+	private void setDbExploitationPage(String instance) {
+		mainPanel.removeAll();
+		menuPanel.removeAll();
+		contentPanel.removeAll();
+		contentButtonPanel.removeAll();
 
-        // Example control in menuPanel
-        JComboBox<String> filters = new JComboBox<>(doctorFilters);
-        filters.setPreferredSize(new Dimension(150, 30));
-        menuPanel.add(new JLabel("Sort by:"));
-        menuPanel.add(filters);
-        
-        // === TOP BUTTONS ===
-        JButton insertButton = createStyledButton("Insert " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
-        JButton deleteButton = createStyledButton("Delete " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
-        
-        switch(instance) {
-        	case"Patient":
-        		insertButton.addActionListener(e -> caller.patientInsertion());
-        		deleteButton.addActionListener(e -> caller.patientDeletion());
-        		entries = QueryExecutor.getAllPatients();
-        		break;
-        	case"Doctor":
-        		insertButton.addActionListener(e -> caller.doctorInsertion());
-        		deleteButton.addActionListener(e -> caller.doctorDeletion());
-        		entries = QueryExecutor.getAllDoctors();
-        		break;
-        	case"Disease":
-        		insertButton.addActionListener(e -> caller.diseaseInsertion());
-        		deleteButton.addActionListener(e -> caller.diseaseDeletion());
-        		
-        		break;
-        	case"Medication":
-        		insertButton.addActionListener(e -> caller.medicationInsertion());
-        		deleteButton.addActionListener(e -> caller.medicationDeletion());
-        		
-        		break;
-        }
-        
-        contentButtonPanel.add(insertButton);
-        contentButtonPanel.add(deleteButton);
-        contentPanel.add(contentButtonPanel);
+		// Scrollable contentPanel wrapper
+		JScrollPane scrollPane = new JScrollPane(contentPanel);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(16);  // smoother scrolling
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridy = 0;
-        gbc.weighty = 1;
-        gbc.fill = GridBagConstraints.BOTH;
+		// === TOP BUTTONS ===
+		JButton insertButton = sc.createStyledButton("Записване на: " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
+		JButton deleteButton = sc.createStyledButton("Изтриване на: " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
 
-        // MenuPanel - 1/4 of the width
-        gbc.gridx = 0;
-        gbc.weightx = 0.25;
-        mainPanel.add(menuPanel, gbc);
+		JComboBox<String> doctorDropBox = new JComboBox<>(doctorOptions);
+		doctorDropBox.setPreferredSize(new Dimension(150, 30));
+		JComboBox<String> patDisMedDropBox = new JComboBox<>(patDisMedOptions);
+		patDisMedDropBox.setPreferredSize(new Dimension(150, 30));
+		menuPanel.add(new JLabel("Соритране по:"));
 
-        // ScrollPane with contentPanel - 3/4 of the width
-        gbc.gridx = 1;
-        gbc.weightx = 0.75;
-        mainPanel.add(scrollPane, gbc);
-    	
-        // Add equal-height entries
-        /*
-        	for (User entry : entries) {
-        		JPanel entryPanel = new JPanel();
-        		entryPanel.setLayout(new BoxLayout(entryPanel, BoxLayout.Y_AXIS));
-        		entryPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+		switch (instance) {
+			case "Пациент":
+				menuPanel.add(patDisMedDropBox);
+				insertButton.addActionListener(e -> caller.patientInsertion());
+				deleteButton.addActionListener(e -> caller.patientDeletion());
+				entries = QueryExecutor.getAllPatients();
+				break;
+			case "Доктор":
+				menuPanel.add(doctorDropBox);
+				insertButton.addActionListener(e -> caller.doctorInsertion());
+				deleteButton.addActionListener(e -> caller.doctorDeletion());
+				entries = QueryExecutor.getAllDoctors();
+				break;
+			case "Заболяване":
+				menuPanel.add(patDisMedDropBox);
+				insertButton.addActionListener(e -> caller.diseaseInsertion());
+				deleteButton.addActionListener(e -> caller.diseaseDeletion());
+				entries = QueryExecutor.getAllDiseases();
+				break;
+			case "Медикамент":
+				menuPanel.add(patDisMedDropBox);
+				insertButton.addActionListener(e -> caller.medicationInsertion());
+				deleteButton.addActionListener(e -> caller.medicationDeletion());
+				entries = QueryExecutor.getAllMedications();
+				break;
+		}
 
-        		// This allows it to grow horizontally but adapt height to content
-        		entryPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-        		entryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);  // Optional: aligns nested panels to left
+		contentButtonPanel.add(insertButton);
+		contentButtonPanel.add(deleteButton);
+		contentPanel.add(contentButtonPanel);
 
-            	if (entry instanceof Doctor)
-            	{
-            		Doctor doc = (Doctor) entry;
-            		entryPanel.add(new JLabel("Doctor's ID: " + doc.getId()));
-            		entryPanel.add(new JLabel("Doctor's Name: " + doc.getName()));
-            		entryPanel.add(new JLabel("Doctor's Surname: " + doc.getSurname()));
-            	}
-            	contentPanel.add(entryPanel);
-        	}
-        	*/
-        
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS)); // Ensure parent stacks entries
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridy = 0;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
 
-        for (User entry : entries) {
-            JPanel entryPanel = new JPanel();
-            entryPanel.setLayout(new BoxLayout(entryPanel, BoxLayout.Y_AXIS));
-            entryPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY),
-                BorderFactory.createEmptyBorder(10, 10, 10, 10) // Padding inside each entry
-            ));
+		// MenuPanel - 1/4 of the width
+		gbc.gridx = 0;
+		gbc.weightx = 0.25;
+		mainPanel.add(menuPanel, gbc);
 
-            // Align panel and let it grow horizontally, shrink to fit vertically
-            entryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		// ScrollPane with contentPanel - 3/4 of the width
+		gbc.gridx = 1;
+		gbc.weightx = 0.75;
+		mainPanel.add(scrollPane, gbc);
 
-            if (entry instanceof Doctor) {
-            	Doctor doc = (Doctor) entry;
-                entryPanel.add(new JLabel("Doctor's ID: " + doc.getId()));
-                entryPanel.add(new JLabel("Doctor's Name: " + doc.getName()));
-                entryPanel.add(new JLabel("Doctor's Surname: " + doc.getSurname()));
-            }
+		for (User entry : entries) {
+			JPanel entryPanel = new JPanel(new GridBagLayout());
+			entryPanel.setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createLineBorder(Color.LIGHT_GRAY),
+					BorderFactory.createEmptyBorder(10, 10, 10, 10)
+			));
+			entryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            contentPanel.add(Box.createVerticalStrut(10)); // Add spacing between entries
-            contentPanel.add(entryPanel);
-        }
+			GridBagConstraints entriesGbc = new GridBagConstraints();
+			entriesGbc.insets = new Insets(2, 0, 2, 2);
+			entriesGbc.anchor = GridBagConstraints.EAST;
+			entriesGbc.gridx = 0;
+			entriesGbc.gridy = 0;
 
-        mainPanel.revalidate();
-        mainPanel.repaint();    
-    }
-    
+			// Helper method to add label pairs
+			BiConsumer<String, String> addLabelPair = (String label, String value) -> {
+				entriesGbc.gridx = 0;
+				entriesGbc.anchor = GridBagConstraints.EAST;
+				entryPanel.add(new JLabel(label), entriesGbc);
+
+				entriesGbc.gridx = 1;
+				entriesGbc.anchor = GridBagConstraints.WEST;
+				entryPanel.add(new JLabel(value), entriesGbc);
+
+				entriesGbc.gridy++;
+			};
+
+
+			if (entry instanceof Doctor doc) {
+				addLabelPair.accept("Код на Доктор:", String.valueOf(doc.getId()));
+				addLabelPair.accept("Име на Доктор:", doc.getName());
+				addLabelPair.accept("Фамилия на Доктор:", doc.getSurname());
+			} else if (entry instanceof Patient pat) {
+				addLabelPair.accept("Код на Пациент:", String.valueOf(pat.getId()));
+				addLabelPair.accept("Име на Пациент:", pat.getName());
+				addLabelPair.accept("Фамилия на Пациент:", pat.getSurname());
+			} else if (entry instanceof Disease dis) {
+				addLabelPair.accept("Код на Заболяване:", String.valueOf(dis.getId()));
+				addLabelPair.accept("Име на Заболяване:", dis.getName());
+				addLabelPair.accept("Описание на Заболяване:", dis.getDescription());
+				addLabelPair.accept("Третиране на Заболяване:", dis.getTreatment());
+			} else if (entry instanceof Medication med) {
+				addLabelPair.accept("Код на Медикамент:", String.valueOf(med.getId()));
+				addLabelPair.accept("Име на Медикамент:", med.getName());
+				addLabelPair.accept("Описание на Медикамент:", med.getDescription());
+				addLabelPair.accept("Дозировка на Медикамент:", med.getDosage());
+			}
+
+			contentPanel.add(Box.createVerticalStrut(10));
+			contentPanel.add(entryPanel);
+		}
+		mainPanel.revalidate();
+		mainPanel.repaint();
+	}
+
     private void setSettingsPage() {
         menuPanel.setBackground(ColorSchemes.MENU_GREEN);
-        
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));  // vertical stack
-        contentPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
 
-        GridBagConstraints gbc = new GridBagConstraints();
+		GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = 0;
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
@@ -264,8 +241,7 @@ public class administratorView extends JFrame implements ActionListener{
         gbc.weightx = 0.75;
         mainPanel.add(contentPanel, gbc);
 
-
         mainPanel.revalidate();
         mainPanel.repaint();     	
-    }
+	}
 }

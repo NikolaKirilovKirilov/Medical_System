@@ -23,10 +23,10 @@ public class DatabaseAuthenticator {
             conn = Connector.getConnection();
             
             switch (userType) {
-                case "Administrator":
+                case "Администратор":
                     String adminCode = codeField.getText().trim();
                     if (adminCode.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "Please enter admin code");
+                        JOptionPane.showMessageDialog(null, "Моля въведете администраторски код!");
                         return false;
                     }
                     
@@ -35,49 +35,64 @@ public class DatabaseAuthenticator {
                     stmt.setString(1, adminCode);
                     rs = stmt.executeQuery();
                     
-                    return rs.next(); // Returns true if admin exists
+                    if (rs.next()) {
+                        return true;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Грешни данни!");
+                        return false;
+                    }
                     
-                case "Doctor":
+                case "Доктор":
                     String doctorCode = codeField.getText().trim();
                     String doctorPassword = passwordField.getText().trim();
                     
                     if (doctorCode.isEmpty() || doctorPassword.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "Please enter both code and password");
+                        JOptionPane.showMessageDialog(null, "Моля въведете лекарски код и парола!");
                         return false;
                     }
                     
-                    String doctorQuery = "SELECT * FROM Doctor WHERE code = ? AND password = ?";
+                    String doctorQuery = "SELECT * FROM Doctor WHERE DoctorCode = ? AND Password = ?";
                     stmt = conn.prepareStatement(doctorQuery);
                     stmt.setString(1, doctorCode);
                     stmt.setString(2, doctorPassword);
                     rs = stmt.executeQuery();
                     
-                    return rs.next(); // Returns true if doctor exists with matching credentials
+                    if (rs.next()) {
+                        return true;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Грешни данни!");
+                        return false;
+                    }
                     
-                case "Patient":
+                case "Пациент":
                     String patientUsername = usernameField.getText().trim();
                     String patientPassword = passwordField.getText().trim();
                     
                     if (patientUsername.isEmpty() || patientPassword.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "Please enter both username and password");
+                        JOptionPane.showMessageDialog(null, "Моля въведете потребителско име и парола!");
                         return false;
                     }
                     
-                    String patientQuery = "SELECT * FROM Patient WHERE username = ? AND password = ?";
+                    String patientQuery = "SELECT * FROM Patient WHERE PatientName = ? AND Password = ?";
                     stmt = conn.prepareStatement(patientQuery);
                     stmt.setString(1, patientUsername);
                     stmt.setString(2, patientPassword);
                     rs = stmt.executeQuery();
                     
-                    return rs.next(); // Returns true if patient exists with matching credentials
+                    if (rs.next()) {
+                        return true;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Грешни данни!");
+                        return false;
+                    }
                     
                 default:
-                    JOptionPane.showMessageDialog(null, "Invalid user type selected");
+                    JOptionPane.showMessageDialog(null, "Невалиден потребител!");
                     return false;
             }
             
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Грешка в базата данни: " + e.getMessage());
             return false;
         } finally {
             // Close resources

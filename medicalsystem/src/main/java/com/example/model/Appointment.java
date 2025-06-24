@@ -16,6 +16,12 @@ public class Appointment implements User {
     public int getCode() {
         return this.code;
     }
+
+    @Override
+    public String getFullName() {
+        return "";
+    }
+
     public int setDocCode() {
         return this.doctorCode;
     }

@@ -3,10 +3,14 @@ package uiComponents;
 import java.awt.*;
 import java.awt.event.*;
 import java.time.LocalDate;
+import java.util.Objects;
 import javax.swing.*;
 
+import com.example.model.Doctor;
+import com.example.model.Patient;
 import customColors.ColorSchemes;
 import database.QueryExecutor;
+import com.example.model.User;
 
 public class Form extends JFrame implements ActionListener {
 
@@ -171,11 +175,10 @@ public class Form extends JFrame implements ActionListener {
 
 	// ----------------- Appointment Methods -----------------
 
-	public void setAppointment(LocalDate date) {
+	public void setAppointment(LocalDate date, String instance) {
 		JDialog dialog = new JDialog(this, "Часове за " + date, true);
 		dialog.setSize(500, 255);
 		dialog.setLayout(new BorderLayout());
-
 
 		JPanel timeSlotPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		String[] timeSlots = {
@@ -201,6 +204,8 @@ public class Form extends JFrame implements ActionListener {
 			JButton slotButton = sc.createStyledButton(slot, ColorSchemes.MENU_GREEN, Color.GRAY, Color.WHITE);
 			slotButton.setPreferredSize(new Dimension(130, 30));
 			slotButton.addActionListener(e -> {
+				String selectedTime = slot.split(" - ")[0]; // Get start time only (e.g., "9:00")
+				insertAppointmentData(date, selectedTime, instance);
 				dialog.dispose();
 			});
 			timeSlotPanel.add(slotButton);
@@ -211,6 +216,50 @@ public class Form extends JFrame implements ActionListener {
 		dialog.setVisible(true);
 	}
 
+	public void insertAppointmentData(LocalDate date, String timeStr, String instance) {
+		if(Objects.equals(instance, "Пациент"))
+			buildForm("Запитване за час", new String[]{
+						"Код на доктор:", "Код на пациент:", "Причина:", "Описание:", "Статус:"},
+				values -> {
+					try {
+						int doctorCode = Integer.parseInt(values[0]);
+						int patientCode = Integer.parseInt(values[1]);
+						String reason = values[2];
+						String description = values[3];
+						String status = values[4];
+
+						QueryExecutor.newAppointment(
+								doctorCode, patientCode, reason, description,
+								date.toString(), timeStr + ":00", // time as HH:mm:ss
+								status
+						);
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(this, "Грешка при записване на час: " + ex.getMessage(),
+								"Грешка", JOptionPane.ERROR_MESSAGE);
+					}
+				});
+		if(Objects.equals(instance, "Доктор"))
+			buildForm("Одобряване на час", new String[]{
+							"Код на доктор:", "Код на пациент:", "Причина:", "Описание:", "Статус:"},
+					values -> {
+						try {
+							int doctorCode = Integer.parseInt(values[0]);
+							int patientCode = Integer.parseInt(values[1]);
+							String reason = values[2];
+							String description = values[3];
+							String status = values[4];
+
+							QueryExecutor.newAppointment(
+									doctorCode, patientCode, reason, description,
+									date.toString(), timeStr + ":00", // time as HH:mm:ss
+									status
+							);
+						} catch (Exception ex) {
+							JOptionPane.showMessageDialog(this, "Грешка при записване на час: " + ex.getMessage(),
+									"Грешка", JOptionPane.ERROR_MESSAGE);
+						}
+					});
+	}
 
 
 	// ----------------- Functional Interface -----------------

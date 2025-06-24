@@ -1,3 +1,6 @@
 package com.example.model;
 
-public interface User {}
+public interface User {
+    int getCode();
+    String getFullName();
+}

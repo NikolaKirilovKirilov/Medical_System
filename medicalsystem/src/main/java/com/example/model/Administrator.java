@@ -28,7 +28,12 @@ public class Administrator implements User{
 	public int getCode() {
 		return this.code;
 	}
-	
+
+	@Override
+	public String getFullName() {
+		return "";
+	}
+
 	public String getName() {
 		return this.name;
 	}

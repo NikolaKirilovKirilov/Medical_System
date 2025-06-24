@@ -37,4 +37,14 @@ public class Disease implements User {
 	public void setTreatment(String treatment) {
 		this.treatment = treatment;
 	}
-} 
+
+	@Override
+	public int getCode() {
+		return 0;
+	}
+
+	@Override
+	public String getFullName() {
+		return "";
+	}
+}

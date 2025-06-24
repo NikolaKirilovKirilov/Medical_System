@@ -5,9 +5,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import javax.swing.*;
+
+import backendFunctionalities.ContentOrganizer;
 import customColors.*;
 import com.example.model.*;
 import database.QueryExecutor;
@@ -20,11 +23,12 @@ public class administratorView extends JFrame implements ActionListener {
 
 	Administrator admin;
 
-	JFrame frame;
 	JPanel mainPanel, headerPanel, menuPanel, contentPanel, contentButtonPanel;
+	JButton insertButton, deleteButton;
 	StyledComponents sc;
 	Color headerColor = ColorSchemes.MENU_GREEN, hoverBackgroundColor = Color.DARK_GRAY, hoverTextColor = Color.WHITE;
 	Form caller;
+	ContentOrganizer organizer;
 
 	static ArrayList<com.example.model.User> entries;
 	final private String[] doctorOptions = { "Код", "Име", "Специализация" };
@@ -46,7 +50,7 @@ public class administratorView extends JFrame implements ActionListener {
 		initializePanels();
 		sc = new StyledComponents();
 		caller = new Form();
-
+		organizer = new ContentOrganizer();
 		// -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 		headerPanel = new JPanel();
@@ -105,6 +109,7 @@ public class administratorView extends JFrame implements ActionListener {
 		menuPanel.removeAll();
 		contentPanel.removeAll();
 		contentButtonPanel.removeAll();
+		contentButtonPanel.setLayout(new GridLayout(1, 2)); // 1 row, 2 columns
 
 		// Scrollable contentPanel wrapper
 		JScrollPane scrollPane = new JScrollPane(contentPanel);
@@ -113,13 +118,32 @@ public class administratorView extends JFrame implements ActionListener {
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);  // smoother scrolling
 
 		// === TOP BUTTONS ===
-		JButton insertButton = sc.createStyledButton("Записване на: " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
-		JButton deleteButton = sc.createStyledButton("Изтриване на: " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
+		insertButton = sc.createStyledButton("Записване на: " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
+		deleteButton = sc.createStyledButton("Изтриване на: " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
 
 		JComboBox<String> doctorDropBox = new JComboBox<>(doctorOptions);
 		doctorDropBox.setPreferredSize(new Dimension(150, 30));
+		doctorDropBox.addActionListener(e -> {
+			if (doctorDropBox.getSelectedItem() != null) {
+				contentPanel = organizer.sortEntries(doctorDropBox, entries, contentPanel, contentButtonPanel, instance);
+				contentPanel.revalidate();
+			}
+		});
+		doctorDropBox.setSelectedItem(null);
+		doctorDropBox.setBackground(Color.WHITE);
+
 		JComboBox<String> patDisMedDropBox = new JComboBox<>(patDisMedOptions);
 		patDisMedDropBox.setPreferredSize(new Dimension(150, 30));
+		patDisMedDropBox.setPreferredSize(new Dimension(150, 30));
+		patDisMedDropBox.addActionListener(e -> {
+			if (patDisMedDropBox.getSelectedItem() != null) {
+				contentPanel = organizer.sortEntries(patDisMedDropBox, entries,contentPanel, contentButtonPanel, instance);
+				contentPanel.revalidate();
+			}
+		});
+		patDisMedDropBox.setSelectedItem(null);
+		patDisMedDropBox.setBackground(Color.WHITE);
+
 		menuPanel.add(new JLabel("Соритране по:"));
 
 		switch (instance) {
@@ -200,6 +224,7 @@ public class administratorView extends JFrame implements ActionListener {
 				addLabelPair.accept("Код на Доктор:", String.valueOf(doc.getId()));
 				addLabelPair.accept("Име на Доктор:", doc.getName());
 				addLabelPair.accept("Фамилия на Доктор:", doc.getSurname());
+				addLabelPair.accept("Специализация:", doc.getSpecialization());
 			} else if (entry instanceof Patient pat) {
 				addLabelPair.accept("Код на Пациент:", String.valueOf(pat.getId()));
 				addLabelPair.accept("Име на Пациент:", pat.getName());

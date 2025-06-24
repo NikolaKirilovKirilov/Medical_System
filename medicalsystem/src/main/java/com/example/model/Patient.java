@@ -35,4 +35,17 @@ public class Patient implements User{
 	public void setSurname(String surname) {
 		this.surname = surname;
 	}
+
+	@Override
+	public String toString() {
+		return id + " - " + name + " " + surname;
+	}
+
+	public String getFullName() {
+		return name + " " + surname;
+	}
+
+	public int getCode() {
+		return id;
+	}
 }

@@ -117,7 +117,13 @@ public class EntryPanel extends JFrame implements ActionListener {
 		
 			else if(comboBox.getSelectedItem() == "Доктор" && e.getSource() == enter)
 			{
-				SwingUtilities.invokeLater(() -> new doctorView());
+				SwingUtilities.invokeLater(() -> {
+                    try {
+                        new doctorView(Integer.parseInt(code.getText().trim()), password.getPassword());
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
 				this.setVisible(false);
 				this.dispose();
 			}

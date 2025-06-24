@@ -83,6 +83,36 @@ public class QueryExecutor {
 		}
 	}
 
+	public static void newAppointment(
+			int doctorCode,
+			int patientCode,
+			String reason,
+			String description,
+			String date,     // format: yyyy-MM-dd
+			String time,     // format: HH:mm:ss
+			String status
+	) {
+		String sql = "INSERT INTO Appointment (DoctorCode, PatientCode, Reason, Description, Date, Hours, Status) " +
+				"VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+		try (Connection conn = Connector.getConnection(); // Adjust this line to match your connection method
+			 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setInt(1, doctorCode);
+			stmt.setInt(2, patientCode);
+			stmt.setString(3, reason);
+			stmt.setString(4, description);
+			stmt.setDate(5, java.sql.Date.valueOf(date));
+			stmt.setTime(6, java.sql.Time.valueOf(time));
+			stmt.setString(7, status);
+
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace(); // Or proper logging
+		}
+	}
+
+
 	// -------------------------------- Deletion Queries --------------------------------
 
 	public static void deletePatient(String code) {
@@ -139,6 +169,7 @@ public class QueryExecutor {
 		return null; // Patient not found
 	}
 
+    /*
 	public static Doctor getDoctorByCodePassword(int code, String password) throws SQLException {
 		String query = "SELECT DoctorCode, DoctorName, DoctorSurname FROM Doctor WHERE DoctorCode = ? AND Password = ?";
 		try (Connection conn = Connector.getConnection()) {
@@ -155,9 +186,36 @@ public class QueryExecutor {
 			}
 		}
 		return null; // Patient not found
-	}
+	}*/
 
-	public static Administrator getAdministratorByCode(int code) throws SQLException {
+    public static Doctor getDoctorByCodePassword(int code, String password) throws SQLException {
+        String query = """
+        SELECT d.DoctorCode, d.DoctorName, d.DoctorSurname, s.SpecializationName
+        FROM Doctor d
+        JOIN DoctorSpecialization ds ON d.DoctorCode = ds.DoctorCode
+        JOIN Specialization s ON ds.SpecializationCode = s.SpecializationCode
+        WHERE d.DoctorCode = ? AND d.Password = ?
+        """;
+
+        try (Connection conn = Connector.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, code);
+            stmt.setString(2, password);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int docCode = rs.getInt("DoctorCode");
+                    String docName = rs.getString("DoctorName");
+                    String docSurname = rs.getString("DoctorSurname");
+                    String specialization = rs.getString("SpecializationName");
+                    return new Doctor(docCode, docName, docSurname, specialization);
+                }
+            }
+        }
+        return null; // Doctor not found
+    }
+
+
+    public static Administrator getAdministratorByCode(int code) throws SQLException {
 		String query = "SELECT AdminCode FROM Admin WHERE AdminCode = ?";
 		try (Connection conn = Connector.getConnection()) {
 			PreparedStatement stmt = conn.prepareStatement(query);
@@ -171,6 +229,31 @@ public class QueryExecutor {
 		}
 		return null; // Patient not found
 	}
+
+    public static Doctor getDoctorByCode(int code) throws SQLException {
+        String query = """
+        SELECT d.DoctorCode, d.DoctorName, d.DoctorSurname, s.SpecializationName
+        FROM Doctor d
+        JOIN DoctorSpecialization ds ON d.DoctorCode = ds.DoctorCode
+        JOIN Specialization s ON ds.SpecializationCode = s.SpecializationCode
+        WHERE d.DoctorCode = ?
+        """;
+
+        try (Connection conn = Connector.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, code);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int docCode = rs.getInt("DoctorCode");
+                    String docName = rs.getString("DoctorName");
+                    String docSurname = rs.getString("DoctorSurname");
+                    String specialization = rs.getString("SpecializationName");
+                    return new Doctor(docCode, docName, docSurname, specialization);
+                }
+            }
+        }
+        return null;
+    }
 
 	public static void getSpecializationByCode(int docCode) {
 		String query = "SELECT s.SpecializationName FROM Specialization s " +
@@ -208,6 +291,7 @@ public class QueryExecutor {
 
 	//---------------------------------------------------Get All Data Queries------------------------------------------
 
+    /*
 	public static ArrayList<User> getAllDoctors() {
 		entries.clear();
 		String query = "SELECT DoctorCode, DoctorName, DoctorSurname FROM Doctor";
@@ -224,9 +308,35 @@ public class QueryExecutor {
 			e.printStackTrace();
 		}
 		return entries;
-	}
+	}*/
 
-	public static ArrayList<User> getAllPatients() {
+    public static ArrayList<User> getAllDoctors() {
+        entries.clear();
+        String query = """
+        SELECT d.DoctorCode, d.DoctorName, d.DoctorSurname, s.SpecializationName
+        FROM Doctor d
+        JOIN DoctorSpecialization ds ON d.DoctorCode = ds.DoctorCode
+        JOIN Specialization s ON ds.SpecializationCode = s.SpecializationCode
+        """;
+
+        try (Connection conn = Connector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                entries.add(new Doctor(
+                        rs.getInt("DoctorCode"),
+                        rs.getString("DoctorName"),
+                        rs.getString("DoctorSurname"),
+                        rs.getString("SpecializationName")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return entries;
+    }
+
+    public static ArrayList<User> getAllPatients() {
 		entries.clear();
 		String query = "SELECT PatientCode, PatientName, PatientSurname FROM Patient";
 		try (Connection conn = Connector.getConnection();

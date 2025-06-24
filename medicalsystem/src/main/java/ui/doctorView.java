@@ -1,6 +1,7 @@
 package ui;
 
 import java.io.Serial;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ public class doctorView extends JFrame implements ActionListener {
 	@Serial
 	private static final long serialVersionUID = 2L;
 
+	Doctor doc;
+
 	JPanel mainPanel, headerPanel, menuPanel, contentPanel, contentButtonPanel;
 	StyledComponents sc;
 	Color headerColor = ColorSchemes.MENU_GREEN, hoverBackgroundColor = Color.DARK_GRAY, hoverTextColor = Color.WHITE,
@@ -28,8 +31,11 @@ public class doctorView extends JFrame implements ActionListener {
 	static ArrayList<com.example.model.User> entries;
 	final private String[] doctorOptions = { "Код", "Име", "Специализация" };
 
-	public doctorView() {
-		this.setTitle("Здравейте Доктор: ");
+	public doctorView(int code, char[] password) throws SQLException {
+		String strPassword = String.valueOf(password);
+		doc = QueryExecutor.getDoctorByCodePassword(code, strPassword);
+
+		this.setTitle("Здравейте Доктор: " + doc.getName() + " " + doc.getSurname());
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setResizable(false);
@@ -55,6 +61,15 @@ public class doctorView extends JFrame implements ActionListener {
 		JButton medicationButton = sc.createStyledButton("Медикаменти", headerColor, hoverBackgroundColor, hoverTextColor);
 		JButton settingsButton = sc.createStyledButton("Настройки", headerColor, hoverBackgroundColor, hoverTextColor);
 
+		patientButton.addActionListener(e -> setDbExploitationPage("Пациент"));
+		prescriptionButton.addActionListener(e -> setDbExploitationPage("Рецепта"));
+		referralButton.addActionListener(e -> setDbExploitationPage("Направление"));
+		medicationButton.addActionListener(e -> setDbExploitationPage("Медикаменти"));
+		diseaseButton.addActionListener(e -> setDbExploitationPage("Заболяване"));
+		medicationButton.addActionListener(e -> setDbExploitationPage("Медикаменти"));
+		appointmentButton.addActionListener(e -> setCalendarPanel("Доктор"));
+		settingsButton.addActionListener(e -> setSettingsPage());
+
 		headerPanel.add(patientButton);
 		headerPanel.add(prescriptionButton);
 		headerPanel.add(referralButton);
@@ -65,15 +80,6 @@ public class doctorView extends JFrame implements ActionListener {
 
 		add(headerPanel, BorderLayout.NORTH);
 		add(mainPanel, FlowLayout.CENTER);
-
-		patientButton.addActionListener(e -> setDbExploitationPage("Пациент"));
-		prescriptionButton.addActionListener(e -> setDbExploitationPage("Рецепта"));
-		referralButton.addActionListener(e -> setDbExploitationPage("Направление"));
-		medicationButton.addActionListener(e -> setDbExploitationPage("Медикаменти"));
-		diseaseButton.addActionListener(e -> setDbExploitationPage("Заболяване"));
-		medicationButton.addActionListener(e -> setDbExploitationPage("Медикаменти"));
-		appointmentButton.addActionListener(e -> setCalendarPanel());
-		settingsButton.addActionListener(e -> setSettingsPage());
 	}
 
 	@Override
@@ -104,6 +110,8 @@ public class doctorView extends JFrame implements ActionListener {
 		contentPanel.removeAll();
 		contentButtonPanel.removeAll();
 
+		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));  // vertical stack
+
 		// Scrollable contentPanel wrapper
 		JScrollPane scrollPane = new JScrollPane(contentPanel);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -126,17 +134,16 @@ public class doctorView extends JFrame implements ActionListener {
 				break;
 			case "Рецепта":
 				entries = QueryExecutor.getAllPrescriptions();
+				contentButtonPanel.add(insertButton);
+				contentPanel.add(contentButtonPanel);
 				break;
 			case "Направление":
 				entries = QueryExecutor.getAllReferrals();
 				contentButtonPanel.add(insertButton);
-				contentButtonPanel.add(deleteButton);
 				contentPanel.add(contentButtonPanel);
 				break;
 			case "Заболяване":
 				entries = QueryExecutor.getAllDiseases();
-				contentButtonPanel.add(insertButton);
-				contentButtonPanel.add(deleteButton);
 				contentPanel.add(contentButtonPanel);
 				break;
 			case "Медикаменти":
@@ -209,7 +216,7 @@ public class doctorView extends JFrame implements ActionListener {
 		mainPanel.repaint();
 	}
 
-	public void setCalendarPanel() {
+	public void setCalendarPanel(String instance) {
 		// Clear previous content
 		mainPanel.removeAll();
 		menuPanel.removeAll();
@@ -252,7 +259,7 @@ public class doctorView extends JFrame implements ActionListener {
 			} else {
 				// Future or today: clickable
 				dayButton.setBackground(Color.WHITE);
-				dayButton.addActionListener(e -> caller.setAppointment(date));
+				dayButton.addActionListener(e -> caller.setAppointment(date, instance));
 			}
 			calendarGrid.add(dayButton);
 		}

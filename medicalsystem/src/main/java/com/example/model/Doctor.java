@@ -3,14 +3,15 @@ package com.example.model;
 public class Doctor implements User{
 	
 	private int id;
-	private String name, surname;
+	private String name, surname, specialization;
 	
 	public Doctor() {};
 	
-	public Doctor(int id, String name, String surname) {
+	public Doctor(int id, String name, String surname, String specialization) {
 		this.id = id;
 		this.name = name;
 		this.surname = surname;
+		this.specialization = specialization;
 	}
 	
 	public int getId() {
@@ -24,6 +25,8 @@ public class Doctor implements User{
 	public String getSurname() {
 		return this.surname;
 	}
+
+	public String getSpecialization() {return this.specialization;}
 	
 	public void setId(int id) {
 		this.id = id;
@@ -36,4 +39,21 @@ public class Doctor implements User{
 	public void setSurname(String surname) {
 		this.surname = surname;
 	}
+
+	public void setSpecialization(String specialization) { this.specialization = specialization; }
+
+	@Override
+	public String toString() {
+		return id + " - Dr. " + name + " " + surname;
+	}
+
+	public String getFullName() {
+		return name + " " + surname;
+	}
+
+	public int getCode() {
+		return id;
+	}
+
+
 }

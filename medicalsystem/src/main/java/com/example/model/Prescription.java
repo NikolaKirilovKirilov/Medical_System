@@ -15,6 +15,12 @@ public class Prescription implements User {
     public int getCode() {
         return this.code;
     }
+
+    @Override
+    public String getFullName() {
+        return "";
+    }
+
     public int getDocCode() {
         return this.doctorCode;
     }

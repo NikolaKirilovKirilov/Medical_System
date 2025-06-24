@@ -68,7 +68,7 @@ public class patientView extends JFrame implements ActionListener {
 		add(mainPanel, FlowLayout.CENTER);
 
 		doctorButton.addActionListener(e -> setDbExploitationPage("Доктори"));
-		appointmentButton.addActionListener(e -> setCalendarPanel());
+		appointmentButton.addActionListener(e -> setCalendarPanel("Пациент"));
 		prescriptionsButton.addActionListener(e -> setDbExploitationPage("Рецепти"));
 		referralButton.addActionListener(e -> setDbExploitationPage("Направления"));
 		settingsButton.addActionListener(e -> setSettingsPage());
@@ -97,6 +97,7 @@ public class patientView extends JFrame implements ActionListener {
 		mainPanel.removeAll();
 		menuPanel.removeAll();
 		contentPanel.removeAll();
+		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));  // vertical stack
 
 		// Scrollable contentPanel wrapper
 		JScrollPane scrollPane = new JScrollPane(contentPanel);
@@ -166,6 +167,7 @@ public class patientView extends JFrame implements ActionListener {
 				addLabelPair.accept("Код на Доктор:", String.valueOf(doc.getId()));
 				addLabelPair.accept("Име на Доктор:", doc.getName());
 				addLabelPair.accept("Фамилия на Доктор:", doc.getSurname());
+				addLabelPair.accept("Специализация:", doc.getSpecialization());
 			} else if (entry instanceof Prescription prs) {
 				addLabelPair.accept("Код на Рецептата:", String.valueOf(prs.getCode()));
 				addLabelPair.accept("Код на Доктор:", String.valueOf(prs.getDocCode()));
@@ -187,7 +189,7 @@ public class patientView extends JFrame implements ActionListener {
 
 	}
 
-	public void setCalendarPanel() {
+	public void setCalendarPanel(String instance) {
 		// Clear previous content
 		mainPanel.removeAll();
 		menuPanel.removeAll();
@@ -230,7 +232,7 @@ public class patientView extends JFrame implements ActionListener {
 			} else {
 				// Future or today: clickable
 				dayButton.setBackground(Color.WHITE);
-				dayButton.addActionListener(e -> caller.setAppointment(date));
+				dayButton.addActionListener(e -> caller.setAppointment(date, instance));
 			}
 			calendarGrid.add(dayButton);
 		}

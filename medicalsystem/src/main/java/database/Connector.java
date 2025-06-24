@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-class Connector {
+public class Connector {
 
 	private static final String connectionUrl =
 			"jdbc:sqlserver://localhost:1433;databaseName=MedicalAssistanceSystem;encrypt=false;user=sa;password=parola1010"

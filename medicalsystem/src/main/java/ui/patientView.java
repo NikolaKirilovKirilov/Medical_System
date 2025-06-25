@@ -10,11 +10,15 @@ import java.awt.event.*;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import javax.swing.*;
+
+import backendFunctionalities.ContentOrganizer;
 import customColors.*;
 import com.example.model.*;
 import database.QueryExecutor;
 import uiComponents.Form;
+import uiComponents.SettingsSetter;
 import uiComponents.StyledComponents;
+import uiComponents.UserPage;
 
 public class patientView extends JFrame implements ActionListener {
 	@Serial
@@ -23,12 +27,16 @@ public class patientView extends JFrame implements ActionListener {
 	Patient patient;
 	JPanel mainPanel, headerPanel, menuPanel, contentPanel;
 	StyledComponents sc;
+	SettingsSetter setSetter;
+	UserPage up;
 	Color headerColor = ColorSchemes.MENU_GREEN, hoverBackgroundColor = Color.DARK_GRAY, hoverTextColor = Color.WHITE,
 			contentColor = ColorSchemes.BACKGROUND_BEIGE;
 	Form caller;
+	ContentOrganizer organizer;
 
 	static ArrayList<com.example.model.User> entries;
-	final private String[] doctorOptions = { "Код", "Име", "Специализация" };
+	final private String[] doctorOptions = {"Код", "Име", "Специализация"};
+	final private String[] patDisMedOptions = {"Код", "Име"};
 
 	public patientView(String name, char[] password) throws SQLException {
 		String strPassword = String.valueOf(password);
@@ -45,15 +53,26 @@ public class patientView extends JFrame implements ActionListener {
 
 		initializePanels();
 
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int menuPanelWidth = (int) (screenSize.width * 0.3);
+		Dimension fixedSize = new Dimension(menuPanelWidth, Integer.MAX_VALUE);
+
+		menuPanel.setPreferredSize(fixedSize);
+		menuPanel.setMinimumSize(fixedSize);
+		menuPanel.setMaximumSize(fixedSize);
+
 		sc = new StyledComponents();
+		setSetter = new SettingsSetter();
 		caller = new Form();
+		up = new UserPage();
+		organizer = new ContentOrganizer();
 
 		headerPanel = new JPanel();
 		headerPanel.setLayout(new GridLayout(1, 5));
 		headerPanel.setBackground(new Color(82, 194, 34));
 
 		JButton doctorButton = sc.createStyledButton("Доктори", headerColor, hoverBackgroundColor, hoverTextColor);
-		JButton appointmentButton = sc.createStyledButton("Часове", headerColor, hoverBackgroundColor, hoverTextColor);
+		JButton appointmentButton = sc.createStyledButton("Личен лекар", headerColor, hoverBackgroundColor, hoverTextColor);
 		JButton prescriptionsButton = sc.createStyledButton("Вашите Рецепти", headerColor, hoverBackgroundColor, hoverTextColor);
 		JButton referralButton = sc.createStyledButton("Вашите Направления", headerColor, hoverBackgroundColor, hoverTextColor);
 		JButton settingsButton = sc.createStyledButton("Настройки", headerColor, hoverBackgroundColor, hoverTextColor);
@@ -71,7 +90,13 @@ public class patientView extends JFrame implements ActionListener {
 		appointmentButton.addActionListener(e -> setCalendarPanel("Пациент"));
 		prescriptionsButton.addActionListener(e -> setDbExploitationPage("Рецепти"));
 		referralButton.addActionListener(e -> setDbExploitationPage("Направления"));
-		settingsButton.addActionListener(e -> setSettingsPage());
+		settingsButton.addActionListener(e -> {
+			mainPanel = setSetter.setSettingsPage(mainPanel, menuPanel, contentPanel);
+		 	mainPanel.revalidate();
+		});
+	}
+
+	private void setDocInfoPage() {
 	}
 
 	@Override
@@ -81,23 +106,29 @@ public class patientView extends JFrame implements ActionListener {
 
 	private void initializePanels() {
 		mainPanel = new JPanel();
+		menuPanel = new JPanel();
+		contentPanel = new JPanel();
+		setPanels();
+	}
+
+	private void setPanels() {
 		mainPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
 		mainPanel.setLayout(new GridBagLayout());
 
-		menuPanel = new JPanel();
 		menuPanel.setBackground(ColorSchemes.MENU_GREEN);
 		menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
+		menuPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-		contentPanel = new JPanel();
 		contentPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));  // vertical stack
-	}
 
-	private void setDbExploitationPage(String instance) {
 		mainPanel.removeAll();
 		menuPanel.removeAll();
 		contentPanel.removeAll();
-		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));  // vertical stack
+	}
+
+	private void setDbExploitationPage(String instance) {
+		setPanels();
 
 		// Scrollable contentPanel wrapper
 		JScrollPane scrollPane = new JScrollPane(contentPanel);
@@ -105,20 +136,41 @@ public class patientView extends JFrame implements ActionListener {
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);  // smoother scrolling
 
-		JComboBox<String> sortBox = new JComboBox<>(doctorOptions);
-		sortBox.setMaximumSize(new Dimension(150, 30));
-		sortBox.setPreferredSize(new Dimension(150, 30));
-		menuPanel.add(new JLabel("Соритране по:"));
-		menuPanel.add(sortBox);
+		JComboBox<String> doctorDropBox = new JComboBox<>(doctorOptions);
+		doctorDropBox.setPreferredSize(new Dimension(150, 30));
+		doctorDropBox.setMaximumSize(doctorDropBox.getPreferredSize());
+		doctorDropBox.addActionListener(e -> {
+			if (doctorDropBox.getSelectedItem() != null) {
+				contentPanel = organizer.sortEntries(doctorDropBox, entries, contentPanel, instance);
+				contentPanel.revalidate();
+			}
+		});
+		doctorDropBox.setSelectedItem(null);
+		doctorDropBox.setBackground(Color.WHITE);
+
+		JComboBox<String> patDisMedDropBox = new JComboBox<>(patDisMedOptions);
+		patDisMedDropBox.setPreferredSize(new Dimension(150, 30));
+		patDisMedDropBox.setMaximumSize(patDisMedDropBox.getPreferredSize());
+		patDisMedDropBox.addActionListener(e -> {
+			if (patDisMedDropBox.getSelectedItem() != null) {
+				contentPanel = organizer.sortEntries(patDisMedDropBox, entries, contentPanel, instance);
+				contentPanel.revalidate();
+			}
+		});
+		patDisMedDropBox.setSelectedItem(null);
+		patDisMedDropBox.setBackground(Color.WHITE);
 
 		switch (instance) {
 			case "Доктори":
+				menuPanel.add(new JLabel("Соритране по:"));
+				menuPanel.add(doctorDropBox);
 				entries = QueryExecutor.getAllDoctors();
 				break;
 			case "Рецепти":
-				entries = QueryExecutor.getAllPrescriptions();
+				entries = QueryExecutor.getAllPrescriptionsByPatient(patient.getCode());
 				break;
 			case "Направления":
+				entries = QueryExecutor.getAllReferralsByPatient(patient.getId());
 				break;
 		}
 
@@ -127,10 +179,7 @@ public class patientView extends JFrame implements ActionListener {
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 
-		// MenuPanel - 1/4 of the width
-		gbc.gridx = 0;
-		gbc.weightx = 0.25;
-		mainPanel.add(menuPanel, gbc);
+		mainPanel.add(menuPanel);
 
 		// ScrollPane with contentPanel - 3/4 of the width
 		gbc.gridx = 1;
@@ -143,11 +192,13 @@ public class patientView extends JFrame implements ActionListener {
 					BorderFactory.createLineBorder(Color.LIGHT_GRAY),  // Dark border to match wireframe
 					BorderFactory.createEmptyBorder(10, 10, 10, 10)
 			));
-			entryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+			entryPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120)); // consistent height
+			entryPanel.setPreferredSize(new Dimension(contentPanel.getWidth(), 120));
+			entryPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 			GridBagConstraints entriesGbc = new GridBagConstraints();
-			entriesGbc.insets = new Insets(5, 5, 5, 5);  // More vertical spacing
-			entriesGbc.anchor = GridBagConstraints.LINE_START;
+			entriesGbc.insets = new Insets(2, 0, 2, 2);
+			entriesGbc.anchor = GridBagConstraints.EAST;
 			entriesGbc.gridx = 0;
 			entriesGbc.gridy = 0;
 
@@ -196,22 +247,11 @@ public class patientView extends JFrame implements ActionListener {
 		contentPanel.removeAll();
 
 		// Setup doctor info panel (menuPanel)
+		menuPanel = up.loadDoctorInfoForPatient(menuPanel, patient);
 		menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
 		menuPanel.setPreferredSize(new Dimension(200, 0));
 		menuPanel.setBackground(ColorSchemes.MENU_GREEN);
-
-		JLabel doctorImage = new JLabel("Снимка на личния лекар", SwingConstants.CENTER);
-		doctorImage.setPreferredSize(new Dimension(180, 180));
-		doctorImage.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		doctorImage.setAlignmentX(Component.CENTER_ALIGNMENT);
 		menuPanel.add(Box.createVerticalStrut(10));
-		menuPanel.add(doctorImage);
-
-		menuPanel.add(Box.createVerticalStrut(10));
-		menuPanel.add(new JLabel("Име на личния лекар"));
-		menuPanel.add(new JLabel("Специализация"));
-		menuPanel.add(Box.createVerticalStrut(20));
-		menuPanel.add(new JLabel("Допълнителни данни"));
 
 		// Setup calendar grid in contentPanel
 		JPanel calendarGrid = new JPanel(new GridLayout(0, 7, 5, 5)); // 7 columns
@@ -232,7 +272,8 @@ public class patientView extends JFrame implements ActionListener {
 			} else {
 				// Future or today: clickable
 				dayButton.setBackground(Color.WHITE);
-				dayButton.addActionListener(e -> caller.setAppointment(date, instance));
+				ArrayList<Appointment> apps = QueryExecutor.getAppointmentsByPatientCode(patient.getCode());
+				dayButton.addActionListener(e -> caller.setAppointment(date, patient, apps));
 			}
 			calendarGrid.add(dayButton);
 		}
@@ -247,14 +288,14 @@ public class patientView extends JFrame implements ActionListener {
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 
-		// Menu panel (left)
+		// Menu panel (left) - fixed width (already set in constructor)
 		gbc.gridx = 0;
-		gbc.weightx = 0.25;
+		gbc.weightx = 0; // No extra space, we're using fixed width
 		mainPanel.add(menuPanel, gbc);
 
-		// Content panel (calendar + chat button)
+		// Content panel (calendar + chat button) - takes remaining space
 		gbc.gridx = 1;
-		gbc.weightx = 0.75;
+		gbc.weightx = 1.0; // Takes all remaining space
 		mainPanel.add(contentPanel, gbc);
 
 		// Refresh UI
@@ -269,31 +310,5 @@ public class patientView extends JFrame implements ActionListener {
 		dayFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		dayFrame.add(new JLabel("Детайли за: " + date, SwingConstants.CENTER));
 		dayFrame.setVisible(true);
-	}
-
-	private void setSettingsPage() {
-		menuPanel.setBackground(ColorSchemes.MENU_GREEN);
-
-		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));  // vertical stack
-		contentPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
-
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridy = 0;
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-
-		// MenuPanel - 1/3 of the width
-		gbc.gridx = 0;
-		gbc.weightx = 0.25;
-		mainPanel.add(menuPanel, gbc);
-
-		// ScrollPane with contentPanel - 2/3 of the width
-		gbc.gridx = 1;
-		gbc.weightx = 0.75;
-		mainPanel.add(contentPanel, gbc);
-
-
-		mainPanel.revalidate();
-		mainPanel.repaint();
 	}
 }

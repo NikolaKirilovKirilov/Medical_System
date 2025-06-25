@@ -34,4 +34,16 @@ public class StyledComponents {
 
         return button;
     }
+
+    public JButton createDisabledButton(String text) {
+        JButton button = new JButton(text);
+        button.setBackground(Color.LIGHT_GRAY);
+        button.setForeground(Color.BLACK);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setOpaque(true);
+        // .,/
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        return button;
+    }
 }

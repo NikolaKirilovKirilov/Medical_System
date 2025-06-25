@@ -22,7 +22,7 @@ public class Referral implements User {
         return "";
     }
 
-    public int setDocCode() {
+    public int getDocCode() {
         return this.doctorCode;
     }
     public int getPatCode() {return this.patientCode;}

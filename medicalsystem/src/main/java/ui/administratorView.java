@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import javax.swing.*;
@@ -15,6 +14,7 @@ import customColors.*;
 import com.example.model.*;
 import database.QueryExecutor;
 import uiComponents.Form;
+import uiComponents.SettingsSetter;
 import uiComponents.StyledComponents;
 
 public class administratorView extends JFrame implements ActionListener {
@@ -26,6 +26,7 @@ public class administratorView extends JFrame implements ActionListener {
 	JPanel mainPanel, headerPanel, menuPanel, contentPanel, contentButtonPanel;
 	JButton insertButton, deleteButton;
 	StyledComponents sc;
+	SettingsSetter setSetter;
 	Color headerColor = ColorSchemes.MENU_GREEN, hoverBackgroundColor = Color.DARK_GRAY, hoverTextColor = Color.WHITE;
 	Form caller;
 	ContentOrganizer organizer;
@@ -49,8 +50,20 @@ public class administratorView extends JFrame implements ActionListener {
 
 		initializePanels();
 		sc = new StyledComponents();
+		setSetter = new SettingsSetter();
 		caller = new Form();
 		organizer = new ContentOrganizer();
+
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int screenWidth = screenSize.width;
+
+		int menuPanelWidth = (int) (screenWidth * 0.3);
+		Dimension fixedSize = new Dimension(menuPanelWidth, Integer.MAX_VALUE);
+
+		menuPanel.setPreferredSize(fixedSize);
+		menuPanel.setMinimumSize(fixedSize);
+		menuPanel.setMaximumSize(fixedSize);
+
 		// -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 		headerPanel = new JPanel();
@@ -81,7 +94,10 @@ public class administratorView extends JFrame implements ActionListener {
 		doctorButton.addActionListener(e -> setDbExploitationPage("Доктор"));
 		diseaseButton.addActionListener(e -> setDbExploitationPage("Заболяване"));
 		medicationButton.addActionListener(e -> setDbExploitationPage("Медикамент"));
-		settingsButton.addActionListener(e -> setSettingsPage());
+		settingsButton.addActionListener(e -> {
+			mainPanel = setSetter.setSettingsPage(mainPanel, menuPanel, contentPanel);
+			mainPanel.revalidate();
+		});
 	}
 
 	@Override
@@ -89,40 +105,47 @@ public class administratorView extends JFrame implements ActionListener {
 
 	private void initializePanels() {
 	        mainPanel = new JPanel();
-	        mainPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
-	        mainPanel.setLayout(new GridBagLayout());
-	        
 	        menuPanel = new JPanel();
-	        menuPanel.setBackground(ColorSchemes.MENU_GREEN);
-	        
 	        contentPanel = new JPanel();
-	        contentPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
-	        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));  // vertical stack
-	        
 	        contentButtonPanel = new JPanel();
-	        contentButtonPanel.setLayout(new GridLayout(1, 2)); // 1 row, 2 columns
-	        contentButtonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+
+			setPanels();
+	 }
+
+	 private void setPanels() {
+		 mainPanel.removeAll();
+		 menuPanel.removeAll();
+		 contentPanel.removeAll();
+		 contentButtonPanel.removeAll();
+
+		 mainPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
+		 mainPanel.setLayout(new GridBagLayout());
+
+		 menuPanel.setBackground(ColorSchemes.MENU_GREEN);
+
+		 contentPanel.setBackground(ColorSchemes.BACKGROUND_BEIGE);
+		 contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));  // vertical stack
+
+		 contentButtonPanel.setLayout(new GridLayout(1, 2)); // 1 row, 2 columns
+		 contentButtonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 	 }
 
 	private void setDbExploitationPage(String instance) {
-		mainPanel.removeAll();
-		menuPanel.removeAll();
-		contentPanel.removeAll();
-		contentButtonPanel.removeAll();
-		contentButtonPanel.setLayout(new GridLayout(1, 2)); // 1 row, 2 columns
+		setPanels();
 
 		// Scrollable contentPanel wrapper
 		JScrollPane scrollPane = new JScrollPane(contentPanel);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.getVerticalScrollBar().setUnitIncrement(16);  // smoother scrolling
+		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
 		// === TOP BUTTONS ===
-		insertButton = sc.createStyledButton("Записване на: " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
-		deleteButton = sc.createStyledButton("Изтриване на: " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
+		insertButton = sc.createStyledButton("Вписване на " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
+		deleteButton = sc.createStyledButton("Изтриване на " + instance, headerColor, hoverBackgroundColor, hoverTextColor);
 
 		JComboBox<String> doctorDropBox = new JComboBox<>(doctorOptions);
 		doctorDropBox.setPreferredSize(new Dimension(150, 30));
+		doctorDropBox.setMaximumSize(doctorDropBox.getPreferredSize());
 		doctorDropBox.addActionListener(e -> {
 			if (doctorDropBox.getSelectedItem() != null) {
 				contentPanel = organizer.sortEntries(doctorDropBox, entries, contentPanel, contentButtonPanel, instance);
@@ -134,7 +157,7 @@ public class administratorView extends JFrame implements ActionListener {
 
 		JComboBox<String> patDisMedDropBox = new JComboBox<>(patDisMedOptions);
 		patDisMedDropBox.setPreferredSize(new Dimension(150, 30));
-		patDisMedDropBox.setPreferredSize(new Dimension(150, 30));
+		patDisMedDropBox.setMaximumSize(patDisMedDropBox.getPreferredSize());
 		patDisMedDropBox.addActionListener(e -> {
 			if (patDisMedDropBox.getSelectedItem() != null) {
 				contentPanel = organizer.sortEntries(patDisMedDropBox, entries,contentPanel, contentButtonPanel, instance);
@@ -143,8 +166,7 @@ public class administratorView extends JFrame implements ActionListener {
 		});
 		patDisMedDropBox.setSelectedItem(null);
 		patDisMedDropBox.setBackground(Color.WHITE);
-
-		menuPanel.add(new JLabel("Соритране по:"));
+		menuPanel.add(new JLabel("Сортиране по "));
 
 		switch (instance) {
 			case "Пациент":
@@ -182,10 +204,7 @@ public class administratorView extends JFrame implements ActionListener {
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 
-		// MenuPanel - 1/4 of the width
-		gbc.gridx = 0;
-		gbc.weightx = 0.25;
-		mainPanel.add(menuPanel, gbc);
+		mainPanel.add(menuPanel);
 
 		// ScrollPane with contentPanel - 3/4 of the width
 		gbc.gridx = 1;
@@ -198,7 +217,9 @@ public class administratorView extends JFrame implements ActionListener {
 					BorderFactory.createLineBorder(Color.LIGHT_GRAY),
 					BorderFactory.createEmptyBorder(10, 10, 10, 10)
 			));
-			entryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+			entryPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120)); // consistent height
+			entryPanel.setPreferredSize(new Dimension(contentPanel.getWidth(), 120));
+			entryPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 			GridBagConstraints entriesGbc = new GridBagConstraints();
 			entriesGbc.insets = new Insets(2, 0, 2, 2);
@@ -246,27 +267,5 @@ public class administratorView extends JFrame implements ActionListener {
 		}
 		mainPanel.revalidate();
 		mainPanel.repaint();
-	}
-
-    private void setSettingsPage() {
-        menuPanel.setBackground(ColorSchemes.MENU_GREEN);
-
-		GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridy = 0;
-        gbc.weighty = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-
-        // MenuPanel - 1/3 of the width
-        gbc.gridx = 0;
-        gbc.weightx = 0.25;
-        mainPanel.add(menuPanel, gbc);
-
-        // ScrollPane with contentPanel - 2/3 of the width
-        gbc.gridx = 1;
-        gbc.weightx = 0.75;
-        mainPanel.add(contentPanel, gbc);
-
-        mainPanel.revalidate();
-        mainPanel.repaint();     	
 	}
 }

@@ -1,145 +1,179 @@
 package uiComponents;
 
-import java.awt.event.ActionListener;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.Serial;
 import java.sql.SQLException;
 import java.util.Objects;
-
-import javax.swing.*;
 
 import database.*;
 import ui.*;
 
 public class EntryPanel extends JFrame implements ActionListener {
-
 	@Serial
 	private static final long serialVersionUID = 1L;
-	private final String[] positions = { "Пациент", "Доктор", "Администратор" };
 
-	DatabaseAuthenticator authenticator = new DatabaseAuthenticator();
+	private final String[] positions = {"Пациент", "Доктор", "Администратор"};
 
-	JComboBox<String> comboBox = new JComboBox<String>(positions);;
-	JTextField name;
-	JTextField code;
-	JPasswordField password;
-	JButton enter;
+	private final JComboBox<String> comboBox = new JComboBox<>(positions);
+	private final JTextField nameField = new JTextField(15);
+	private final JTextField codeField = new JTextField(15);
+	private final JPasswordField passwordField = new JPasswordField(15);
+	private final JButton enterButton = new JButton("ВХОД");
+
+	JLabel spacer = new JLabel(" ");
+	private final JLabel nameLabel = new JLabel("Име:");
+	private final JLabel codeLabel = new JLabel("Код:");
+	private final JLabel passwordLabel = new JLabel("Парола:");
+
+	private final DatabaseAuthenticator authenticator = new DatabaseAuthenticator();
 
 	public EntryPanel() {
-		this.setTitle("Вход");
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setResizable(false);
-		this.setSize(300, 290);
+		setTitle("Вход");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		setSize(250, 200);
+		setLocationRelativeTo(null);
 
 		ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/images/MASicon.png")));
-		this.setIconImage(icon.getImage());
+		setIconImage(icon.getImage());
 
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
-
-		comboBox = new JComboBox<String>(positions);
-		name = new JTextField();
-		code = new JTextField();
-		password = new JPasswordField();
-		enter = new JButton();
-
-		comboBox.setBounds(80, 20, 120, 30);
-		comboBox.addActionListener(this);
 		comboBox.setSelectedItem(null);
 		comboBox.setBackground(Color.WHITE);
+		comboBox.addActionListener(this);
+		comboBox.setMaximumSize(new Dimension(150,30));
+		comboBox.setPreferredSize(new Dimension(150, 30));
 
-		name.setBounds(40, 70, 200, 30);
-		name.setVisible(false);
+		enterButton.setFocusable(false);
+		enterButton.setBackground(Color.WHITE);
+		enterButton.addActionListener(this);
 
-		code.setBounds(40, 100, 200, 30);
-		code.setVisible(false);
+		// Initially hidden fields
+		nameLabel.setVisible(false);
+		nameField.setVisible(false);
+		codeLabel.setVisible(false);
+		codeField.setVisible(false);
+		passwordLabel.setVisible(false);
+		passwordField.setVisible(false);
 
-		password.setBounds(40, 150, 200, 30);
-		password.setVisible(false);
+		// Layout for input form
+		JPanel formPanel = new JPanel();
+		GroupLayout layout = new GroupLayout(formPanel);
+		formPanel.setLayout(layout);
+		layout.setAutoCreateGaps(true);
+		layout.setAutoCreateContainerGaps(true);
 
-		enter.setBounds(90, 200, 100, 30);
-		enter.addActionListener(this);
-		enter.setText("ВХОД");
-		enter.setFocusable(false);
-		enter.setBackground(Color.WHITE);
+		layout.setHorizontalGroup(
+				layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+						.addGroup(layout.createSequentialGroup()
+								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+										.addComponent(nameLabel)
+										.addComponent(codeLabel)
+										.addComponent(passwordLabel)
+										.addComponent(spacer, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)) // added here
+								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+										.addComponent(nameField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+										.addComponent(codeField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+										.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)))
+						.addComponent(enterButton, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
+		);
 
-		getContentPane().setLayout(null);
-		getContentPane().add(comboBox);
-		getContentPane().add(name);
-		getContentPane().add(code);
-		getContentPane().add(password);
-		getContentPane().add(enter);
+		layout.setVerticalGroup(
+				layout.createSequentialGroup()
+						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+						.addGap(15)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(nameLabel)
+								.addComponent(nameField))
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(codeLabel)
+								.addComponent(codeField))
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(passwordLabel)
+								.addComponent(passwordField))
+						.addComponent(spacer, 0, 0, 0) // dummy to keep it in both groups
+						.addGap(20)
+						.addComponent(enterButton)
+		);
 
-		this.setVisible(true);
+		// Center everything in a BorderLayout
+		JPanel wrapper = new JPanel(new BorderLayout());
+		wrapper.add(formPanel, BorderLayout.CENTER);
+		add(wrapper);
+
+		setVisible(true);
 	}
 
-	public void actionPerformed(ActionEvent e)
-	{
-		if(e.getSource() == comboBox)
-		{
-			if(comboBox.getSelectedItem() == "Пациент")
-			{
-				name.setVisible(true);
-				code.setVisible(false);
-				password.setVisible(true);
-			}
-			else if(comboBox.getSelectedItem() == "Доктор")
-			{
-				name.setVisible(false);
-				code.setVisible(true);
-				password.setVisible(true);
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object selected = comboBox.getSelectedItem();
 
+		if (e.getSource() == comboBox && selected != null) {
+			String role = selected.toString();
+
+			// Hide all first
+			nameLabel.setVisible(false);
+			nameField.setVisible(false);
+			codeLabel.setVisible(false);
+			codeField.setVisible(false);
+			passwordLabel.setVisible(false);
+			passwordField.setVisible(false);
+
+			// Show relevant fields
+			switch (role) {
+				case "Пациент" -> {
+					nameLabel.setVisible(true);
+					nameField.setVisible(true);
+					passwordLabel.setVisible(true);
+					passwordField.setVisible(true);
+				}
+				case "Доктор" -> {
+					codeLabel.setVisible(true);
+					codeField.setVisible(true);
+					passwordLabel.setVisible(true);
+					passwordField.setVisible(true);
+				}
+				case "Администратор" -> {
+					codeLabel.setVisible(true);
+					codeField.setVisible(true);
+				}
 			}
-			else if(comboBox.getSelectedItem() == "Администратор")
-			{
-				name.setVisible(false);
-				code.setVisible(true);
-				password.setVisible(false);
-			}
+
+			revalidate();
+			repaint();
 		}
-		
-		if(e.getSource() == enter && authenticator.authenticateUser(comboBox, code, name, password)) {
-			if(comboBox.getSelectedItem() == "Пациент" && e.getSource() == enter)
-			{
-				SwingUtilities.invokeLater(() -> {
-                    try {
-                        new patientView(name.getText().trim(), password.getPassword());
-                    } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                });
-				this.setVisible(false);
-				this.dispose();
+
+		if (e.getSource() == enterButton &&
+				authenticator.authenticateUser(comboBox, codeField, nameField, passwordField)) {
+
+			String role = Objects.requireNonNull(comboBox.getSelectedItem()).toString();
+
+			switch (role) {
+				case "Пациент" -> SwingUtilities.invokeLater(() -> {
+					try {
+						new patientView(nameField.getText().trim(), passwordField.getPassword());
+					} catch (SQLException ex) {
+						throw new RuntimeException(ex);
+					}
+				});
+				case "Доктор" -> SwingUtilities.invokeLater(() -> {
+					try {
+						new doctorView(Integer.parseInt(codeField.getText().trim()), passwordField.getPassword());
+					} catch (SQLException ex) {
+						throw new RuntimeException(ex);
+					}
+				});
+				case "Администратор" -> SwingUtilities.invokeLater(() -> {
+					try {
+						new administratorView(Integer.parseInt(codeField.getText().trim()));
+					} catch (SQLException ex) {
+						throw new RuntimeException(ex);
+					}
+				});
 			}
-		
-			else if(comboBox.getSelectedItem() == "Доктор" && e.getSource() == enter)
-			{
-				SwingUtilities.invokeLater(() -> {
-                    try {
-                        new doctorView(Integer.parseInt(code.getText().trim()), password.getPassword());
-                    } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                });
-				this.setVisible(false);
-				this.dispose();
-			}
-		
-			else if(comboBox.getSelectedItem() == "Администратор" && e.getSource() == enter)
-			{
-				SwingUtilities.invokeLater(() -> {
-                    try {
-                        new administratorView(Integer.parseInt(code.getText().trim()));
-                    } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                });
-				this.setVisible(false);
-				this.dispose();
-			}
+			this.dispose();
 		}
 	}
 }
